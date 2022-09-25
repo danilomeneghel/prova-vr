@@ -1,0 +1,50 @@
+package api.entity;
+
+import api.enums.CartaoStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import java.util.Date;
+
+@Entity
+@Table(name = "cartao")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CartaoEntity {
+
+    @Id
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
+    @Column( name = "id", unique = true, nullable = false )
+    private Long id;
+
+    @Column(name = "numeroCartao", nullable = false)
+    @NotBlank( message = "Número do Cartão é obrigatório" )
+    private String numeroCartao;
+
+    @Column(name = "senha", nullable = false)
+    @NotBlank( message = "Senha é obrigatória" )
+    private String senha;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_saldo", nullable = false)
+    private SaldoEntity saldo;
+
+    private CartaoStatus status;
+
+    @CreationTimestamp
+    @Temporal( TemporalType.TIMESTAMP )
+    private Date createdAt;
+
+    @UpdateTimestamp
+    @Temporal( TemporalType.TIMESTAMP )
+    private Date updatedAt;
+
+}
