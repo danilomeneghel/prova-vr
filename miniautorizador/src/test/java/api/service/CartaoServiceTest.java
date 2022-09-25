@@ -2,9 +2,11 @@ package api.service;
 
 import api.ApplicationTests;
 import api.entity.CartaoEntity;
+import api.entity.SaldoEntity;
 import api.enums.CartaoStatus;
 import api.exception.RecordNotFoundException;
 import api.model.CartaoModel;
+import api.model.SaldoModel;
 import api.repository.CartaoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -33,9 +35,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Cria o Cartão com sucesso")
     void testSaveCartao() throws RecordNotFoundException {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
@@ -50,15 +54,18 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Localiza todos os Cartões por Status com sucesso")
     void testFindAllByStatus() {
+        SaldoEntity saldo = new SaldoEntity();
         List<CartaoEntity> mockListCartaoEntities = Stream.of(
                         CartaoEntity.builder()
                                 .numeroCartao("1111111111")
                                 .senha("2222222222")
+                                .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build(),
                         CartaoEntity.builder()
-                                .numeroCartao("1111111111")
-                                .senha("2222222222")
+                                .numeroCartao("2222222222")
+                                .senha("33333333333")
+                                .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build())
                 .collect(Collectors.toList());
@@ -75,15 +82,18 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Localiza todos os Cartões por Status inválido")
     void testFindAllByStatusInvalid() {
+        SaldoEntity saldo = new SaldoEntity();
         List<CartaoEntity> mockListCartaoEntities = Stream.of(
                         CartaoEntity.builder()
                                 .numeroCartao("1111111111")
                                 .senha("2222222222")
+                                .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build(),
                         CartaoEntity.builder()
                                 .numeroCartao("1111111111")
                                 .senha("2222222222")
+                                .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build())
                 .collect(Collectors.toList());
@@ -99,9 +109,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Localiza o Cartão por ID com sucesso")
     void testFindCartaoById() throws RecordNotFoundException {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
@@ -116,9 +128,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Localiza o Cartão por ID inválido")
     void testFindCartaoByIdInvalid() throws RecordNotFoundException {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
@@ -134,9 +148,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Altera o Cartão por ID com sucesso")
     void testUpdateCartao() throws RecordNotFoundException {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
@@ -154,9 +170,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Altera o Cartão por ID inválido")
     void testUpdateCartaoIdInvalid() {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
@@ -175,9 +193,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Exclui o Cartão por ID com sucesso")
     void testDeleteCartaoById() throws RecordNotFoundException {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
@@ -192,9 +212,11 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Exclui o Cartão por ID inválido")
     void testDeleteCartaoByIdInvalid() {
+        SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
+                .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 

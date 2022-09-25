@@ -9,8 +9,8 @@ import java.util.Arrays;
 @Getter
 public enum CartaoStatus {
 
-    ATIVO( "ATIVO" ),
-    INATIVO( "INATIVO" );
+    INATIVO( "INATIVO" ),
+    ATIVO( "ATIVO" );
 
     private String value;
 
