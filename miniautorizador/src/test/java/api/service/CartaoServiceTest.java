@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,11 +61,13 @@ public class CartaoServiceTest extends ApplicationTests {
     void testFindAllByStatus() {
         List<CartaoEntity> mockListCartoesEntities = Stream.of(
                         CartaoEntity.builder()
+                                .id(1L)
                                 .numeroCartao("1111111111")
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build(),
                         CartaoEntity.builder()
+                                .id(2L)
                                 .numeroCartao("2222222222")
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
@@ -86,12 +89,14 @@ public class CartaoServiceTest extends ApplicationTests {
     void testFindAllByStatusInvalid() {
         List<CartaoEntity> mockListCartoesEntities = Stream.of(
                         CartaoEntity.builder()
+                                .id(1L)
                                 .numeroCartao("1111111111")
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build(),
                         CartaoEntity.builder()
-                                .numeroCartao("1111111111")
+                                .id(2L)
+                                .numeroCartao("2222222222")
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build())
@@ -100,16 +105,20 @@ public class CartaoServiceTest extends ApplicationTests {
         when(cartaoRepository.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.ATIVO))
                 .thenReturn(mockListCartoesEntities);
 
-        List<CartaoModel> cartoes = cartaoService.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.INATIVO);
-        List< CartaoEntity > listaCartoes = cartoes.stream().map(entity -> mapper.map(entity, CartaoEntity.class)).collect(Collectors.toList());
-
-        assertNotEquals(mockListCartoesEntities, listaCartoes);
+        try {
+            List<CartaoModel> cartoes = cartaoService.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.INATIVO);
+            List< CartaoEntity > listaCartoes = cartoes.stream().map(entity -> mapper.map(entity, CartaoEntity.class)).collect(Collectors.toList());
+            assertNotEquals(mockListCartoesEntities, listaCartoes);
+        } catch (Exception e) {
+            assertEquals("Nenhum cartão encontrado.", e.getMessage());
+        }
     }
 
     @Test
     @DisplayName("Localiza o Cartão por ID com sucesso")
     void testFindCartaoById() throws RecordNotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+                .id(1L)
                 .numeroCartao("1111111111")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
@@ -128,6 +137,7 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Localiza o Cartão por ID inválido")
     void testFindCartaoByIdInvalid() throws RecordNotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+                .id(1L)
                 .numeroCartao("1111111111")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
@@ -138,7 +148,7 @@ public class CartaoServiceTest extends ApplicationTests {
         try {
             cartaoService.findCartaoById(2L);
         } catch (Exception e) {
-            assertEquals("ID não encontrado.", e.getMessage());
+            assertEquals("Nenhum cartão encontrado.", e.getMessage());
         }
     }
 
@@ -153,11 +163,10 @@ public class CartaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.findByNumeroCartao("1111111111")).thenReturn(Optional.of(mockCartaoEntity));
 
-        CartaoModel findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
-        CartaoEntity cartaoEntity = mapper.map(findCartao, CartaoEntity.class);
+        BigDecimal findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
 
-        Assertions.assertNotNull(cartaoEntity);
-        assertEquals(mockCartaoEntity, cartaoEntity);
+        Assertions.assertNotNull(findCartao);
+        assertEquals(mockCartaoEntity.getSaldo().getValor(), findCartao);
     }
 
     @Test
@@ -174,7 +183,7 @@ public class CartaoServiceTest extends ApplicationTests {
         try {
             cartaoService.findCartaoByNumeroCartao("555555555");
         } catch (Exception e) {
-            assertEquals("Número do cartão não encontrado.", e.getMessage());
+            assertEquals("Número do cartão não encontrado. Tente novamente.", e.getMessage());
         }
     }
 
@@ -220,7 +229,7 @@ public class CartaoServiceTest extends ApplicationTests {
         try {
             cartaoService.update(2L, mockCartaoEntity);
         } catch (Exception e) {
-            assertEquals("ID não encontrado.", e.getMessage());
+            assertEquals("Nenhum cartão encontrado.", e.getMessage());
         }
     }
 
@@ -257,7 +266,7 @@ public class CartaoServiceTest extends ApplicationTests {
         try {
             cartaoService.deleteCartaoById(2L);
         } catch (Exception e) {
-            assertEquals("ID não encontrado.", e.getMessage());
+            assertEquals("Nenhum cartão encontrado.", e.getMessage());
         }
     }
 
