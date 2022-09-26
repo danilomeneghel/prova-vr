@@ -12,8 +12,8 @@ Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Sp
 
 ## Requisitos
 
-- Java JDK 11
-- Apache Maven >= 3.6.3 (Opcional)
+- Java JDK 17
+- Apache Maven >= 3.8.6 (Opcional)
 - Docker
 
 ## Tecnologias

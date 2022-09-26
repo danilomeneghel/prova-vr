@@ -26,11 +26,10 @@ public class CartaoEntity {
     private Long id;
 
     @Column(name = "numeroCartao", nullable = false)
-    @NotBlank( message = "Número do Cartão é obrigatório" )
+    @NotBlank( message = "Número do cartão é obrigatório" )
     private String numeroCartao;
 
-    @Column(name = "senha", nullable = false)
-    @NotBlank( message = "Senha é obrigatória" )
+    @Column(name = "senha")
     private String senha;
 
     @OneToOne(fetch = FetchType.LAZY)

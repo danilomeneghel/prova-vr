@@ -27,7 +27,7 @@ public class CartaoService {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public CartaoModel findByNumeroCartao( String numeroCartao ) {
+    public CartaoModel findCartaoByNumeroCartao(String numeroCartao ) {
         CartaoEntity cartaoEntity = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( new CartaoEntity() );
         return mapper.map(cartaoEntity, CartaoModel.class);
     }
@@ -63,14 +63,14 @@ public class CartaoService {
     }
 
     public CartaoModel update(Long id, CartaoEntity cartaoEntity) throws RecordNotFoundException {
-        CartaoEntity cartao = cartaoRepository.findById( id ).orElse( new CartaoEntity() );
-        if( cartao.getId() != null ) {
+        if( cartaoRepository.existsById( id ) ) {
+            cartaoEntity.setId(id);
             SaldoEntity saldoEntity = saldoRepository.findById( id ).orElse( new SaldoEntity() );
             cartaoEntity.setSaldo(saldoEntity);
-            cartaoEntity.setId(id);
             cartaoEntity.setNumeroCartao( cartaoEntity.getNumeroCartao() );
             cartaoEntity.setSenha( cartaoEntity.getSenha() );
             cartaoEntity.setStatus( (cartaoEntity.getStatus() != null) ? cartaoEntity.getStatus() : CartaoStatus.ATIVO );
+            CartaoEntity cartao = cartaoRepository.findById( id ).orElse( new CartaoEntity() );
             cartaoEntity.setCreatedAt(cartao.getCreatedAt());
             cartaoEntity = cartaoRepository.save(cartaoEntity);
             return mapper.map(cartaoEntity, CartaoModel.class);

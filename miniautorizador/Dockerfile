@@ -1,4 +1,4 @@
 # select image openjdk
-FROM openjdk:11-jdk
+FROM openjdk:17
 
 COPY ./ ./

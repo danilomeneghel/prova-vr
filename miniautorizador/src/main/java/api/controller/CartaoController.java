@@ -25,7 +25,7 @@ public class CartaoController {
 
     @GetMapping( value = "/{numeroCartao}" )
     public ResponseEntity< ? > getCardByNumber(@PathVariable String numeroCartao) {
-        CartaoModel cartao = cartaoService.findByNumeroCartao(numeroCartao);
+        CartaoModel cartao = cartaoService.findCartaoByNumeroCartao(numeroCartao);
         if( cartao.getNumeroCartao() == null ) {
             return new ResponseEntity< >( new CustomErrorType( "Número do cartão " + numeroCartao + " não encontrado." ), HttpStatus.NOT_FOUND );
         }
@@ -53,7 +53,7 @@ public class CartaoController {
     @PostMapping
     public ResponseEntity< ? > createCard( @Valid @RequestBody CartaoEntity cartaoEntity) throws RecordNotFoundException {
         if( cartaoService.isCartaoExist(cartaoEntity) ) {
-            return new ResponseEntity< >( new CustomErrorType( "Número do cartão " + cartaoEntity.getNumeroCartao() + " já cadastrado." ), HttpStatus.CONFLICT );
+            return new ResponseEntity< >( new CustomErrorType( "Número do cartão " + cartaoEntity.getNumeroCartao() + " já cadastrado." ), HttpStatus.UNPROCESSABLE_ENTITY );
         }
         CartaoModel cartaoEntityNovo = cartaoService.save(cartaoEntity);
         return new ResponseEntity< >(cartaoEntityNovo, HttpStatus.CREATED );

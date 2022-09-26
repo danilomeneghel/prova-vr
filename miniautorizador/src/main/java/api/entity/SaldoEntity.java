@@ -18,6 +18,7 @@ public class SaldoEntity {
     @Column( name = "id", unique = true, nullable = false )
     private Long id;
 
+    @Column(name = "valor", nullable = false)
     private BigDecimal valor = BigDecimal.valueOf(500);
 
     @CreationTimestamp
