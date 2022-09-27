@@ -2,7 +2,7 @@ package api.controller;
 
 import api.entity.CartaoEntity;
 import api.enums.CartaoStatus;
-import api.exception.RecordNotFoundException;
+import api.exception.NotFoundException;
 import api.model.CartaoModel;
 import api.service.CartaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -23,10 +22,10 @@ import java.util.List;
 public class CartaoController {
 
     @Autowired
-    CartaoService cartaoService;
+    private CartaoService cartaoService;
 
     @GetMapping( value = "/{numeroCartao}" )
-    public ResponseEntity< BigDecimal > getCardByNumber(@PathVariable String numeroCartao) {
+    public ResponseEntity< String > getCardByNumber(@PathVariable String numeroCartao) {
         return new ResponseEntity< >(cartaoService.findCartaoByNumeroCartao(numeroCartao), HttpStatus.OK);
     }
 
@@ -46,17 +45,17 @@ public class CartaoController {
     }
 
     @PostMapping
-    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CartaoEntity cartaoEntity) throws RecordNotFoundException {
+    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CartaoEntity cartaoEntity) throws NotFoundException {
         return new ResponseEntity< >(cartaoService.save(cartaoEntity), HttpStatus.CREATED );
     }
 
     @PutMapping( value = "/{id}" )
-    public ResponseEntity< CartaoModel > updateCard( @PathVariable( "id" ) Long id, @Valid @RequestBody CartaoEntity cartaoEntity) throws RecordNotFoundException {
+    public ResponseEntity< CartaoModel > updateCard( @PathVariable( "id" ) Long id, @Valid @RequestBody CartaoEntity cartaoEntity) throws NotFoundException {
         return new ResponseEntity< >(cartaoService.update( id, cartaoEntity), HttpStatus.OK );
     }
 
     @DeleteMapping( value = "/{id}" )
-    public ResponseEntity< String > deleteCard( @PathVariable( "id" ) Long id ) throws RecordNotFoundException {
+    public ResponseEntity< String > deleteCard( @PathVariable( "id" ) Long id ) throws NotFoundException {
         return new ResponseEntity< >( cartaoService.deleteCartaoById( id ), HttpStatus.OK );
     }
 

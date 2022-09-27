@@ -1,6 +1,7 @@
 package api.controller;
 
 import api.entity.TransacaoEntity;
+import api.model.TransacaoModel;
 import api.service.TransacaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping( "/transacoes" )
@@ -18,20 +20,20 @@ import javax.validation.Valid;
 public class TransacaoController {
 
     @Autowired
-    TransacaoService transacaoService;
+    private TransacaoService transacaoService;
 
     @GetMapping( value = "/{id}" )
-    public ResponseEntity< TransacaoEntity > getTransactionById(@PathVariable Long id) {
+    public ResponseEntity< TransacaoModel > getTransactionById(@PathVariable Long id) {
         return new ResponseEntity< >(transacaoService.findById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity< Iterable<TransacaoEntity> > listTransactions() {
+    public ResponseEntity< List< TransacaoModel > > listTransactions() {
         return new ResponseEntity< >( transacaoService.findAll(), HttpStatus.OK );
     }
 
     @PostMapping
-    public ResponseEntity< TransacaoEntity > createTransaction( @Valid @RequestBody TransacaoEntity transacaoEntity) {
+    public ResponseEntity<TransacaoModel> createTransaction(@Valid @RequestBody TransacaoEntity transacaoEntity) {
         return new ResponseEntity< >(transacaoService.save(transacaoEntity), HttpStatus.CREATED );
     }
 

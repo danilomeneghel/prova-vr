@@ -4,7 +4,7 @@ import api.ApplicationTests;
 import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.enums.CartaoStatus;
-import api.exception.RecordNotFoundException;
+import api.exception.NotFoundException;
 import api.model.CartaoModel;
 import api.repository.CartaoRepository;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +14,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +38,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Cria o Cartão com sucesso")
-    void testSaveCartao() throws RecordNotFoundException {
+    void testSaveCartao() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .saldo(saldo)
@@ -116,7 +115,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por ID com sucesso")
-    void testFindCartaoById() throws RecordNotFoundException {
+    void testFindCartaoById() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("1111111111")
@@ -135,7 +134,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por ID inválido")
-    void testFindCartaoByIdInvalid() throws RecordNotFoundException {
+    void testFindCartaoByIdInvalid() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("1111111111")
@@ -154,7 +153,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por Número do Cartão com sucesso")
-    void testFindCartaoByNumber() throws RecordNotFoundException {
+    void testFindCartaoByNumber() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .saldo(saldo)
@@ -163,15 +162,15 @@ public class CartaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.findByNumeroCartao("1111111111")).thenReturn(Optional.of(mockCartaoEntity));
 
-        BigDecimal findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
+        String findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
 
         Assertions.assertNotNull(findCartao);
-        assertEquals(mockCartaoEntity.getSaldo().getValor(), findCartao);
+        assertEquals("R$ " + mockCartaoEntity.getSaldo().getValor(), findCartao);
     }
 
     @Test
     @DisplayName("Localiza o Cartão por Número do Cartão inválido")
-    void testFindCartaoByNumberInvalid() throws RecordNotFoundException {
+    void testFindCartaoByNumberInvalid() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .saldo(saldo)
@@ -189,7 +188,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Altera o Cartão por ID com sucesso")
-    void testUpdateCartao() throws RecordNotFoundException {
+    void testUpdateCartao() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("xxxxxxxx")
@@ -235,7 +234,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Exclui o Cartão por ID com sucesso")
-    void testDeleteCartaoById() throws RecordNotFoundException {
+    void testDeleteCartaoById() throws NotFoundException {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")

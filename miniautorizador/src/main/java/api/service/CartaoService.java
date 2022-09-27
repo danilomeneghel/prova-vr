@@ -3,7 +3,9 @@ package api.service;
 import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.enums.CartaoStatus;
-import api.exception.ModelException;
+import api.exception.BadRequestException;
+import api.exception.NotFoundException;
+import api.exception.UnprocessableEntityException;
 import api.model.CartaoModel;
 import api.model.errors.CartaoErrors;
 import api.repository.CartaoRepository;
@@ -13,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,18 +30,18 @@ public class CartaoService {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public BigDecimal findCartaoByNumeroCartao( String numeroCartao ) {
+    public String findCartaoByNumeroCartao( String numeroCartao ) {
         CartaoEntity cartao = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( new CartaoEntity() );
         while ( cartao.getNumeroCartao() == null ) {
-            throw new ModelException(CartaoErrors.INVALID_NUMBER_CARD);
+            throw new NotFoundException(CartaoErrors.INVALID_NUMBER_CARD);
         }
-        return cartao.getSaldo().getValor();
+        return "R$ " + cartao.getSaldo().getValor();
     }
 
     public CartaoModel findCartaoById( Long id ) {
         CartaoEntity cartao = cartaoRepository.findById( id ).orElse( new CartaoEntity() );
         while ( cartao.getId() == null ) {
-            throw new ModelException(CartaoErrors.NOT_FOUND);
+            throw new NotFoundException(CartaoErrors.NOT_FOUND);
         }
         return mapper.map(cartao, CartaoModel.class);
     }
@@ -48,7 +49,7 @@ public class CartaoService {
     public List< CartaoModel > findAllByOrderByNumeroCartaoAsc() {
         List<CartaoEntity> cartoes = cartaoRepository.findAllByOrderByNumeroCartaoAsc();
         while ( cartoes.isEmpty() ) {
-            throw new ModelException(CartaoErrors.NOT_FOUND);
+            throw new NotFoundException(CartaoErrors.NOT_FOUND);
         }
         return cartoes.stream().map(entity -> mapper.map(entity, CartaoModel.class)).collect(Collectors.toList());
     }
@@ -56,14 +57,14 @@ public class CartaoService {
     public List< CartaoModel > findAllByStatusOrderByNumeroCartaoAsc( CartaoStatus status ) {
         List<CartaoEntity> cartoes = cartaoRepository.findAllByStatusOrderByNumeroCartaoAsc( status );
         while ( cartoes.isEmpty() ) {
-            throw new ModelException(CartaoErrors.NOT_FOUND);
+            throw new NotFoundException(CartaoErrors.NOT_FOUND);
         }
         return cartoes.stream().map(entity -> mapper.map(entity, CartaoModel.class)).collect(Collectors.toList());
     }
 
     public CartaoModel save(CartaoEntity cartaoEntity) {
         while ( isCardExist(cartaoEntity) ) {
-            throw new ModelException(CartaoErrors.CARD_EXISTS);
+            throw new UnprocessableEntityException(CartaoErrors.CARD_EXISTS);
         }
         try {
             SaldoEntity saldoEntity = new SaldoEntity();
@@ -73,24 +74,24 @@ public class CartaoService {
             cartaoEntity = cartaoRepository.save(cartaoEntity);
             return mapper.map(cartaoEntity, CartaoModel.class);
         } catch (Exception e) {
-            throw new ModelException(CartaoErrors.ERROR_CREATING);
+            throw new BadRequestException(CartaoErrors.ERROR_CREATING);
         }
     }
 
     public CartaoModel update(Long id, CartaoEntity cartaoEntity) {
+        CartaoEntity cartao = cartaoRepository.findById( id ).orElse( new CartaoEntity() );
         while ( cartaoRepository.existsById( id ) ) {
             cartaoEntity.setId(id);
-            SaldoEntity saldoEntity = saldoRepository.findById( id ).orElse( new SaldoEntity() );
+            SaldoEntity saldoEntity = saldoRepository.findById( cartao.getSaldo().getId() ).orElse( new SaldoEntity() );
             cartaoEntity.setSaldo(saldoEntity);
             cartaoEntity.setNumeroCartao( cartaoEntity.getNumeroCartao() );
             cartaoEntity.setSenha( cartaoEntity.getSenha() );
             cartaoEntity.setStatus( (cartaoEntity.getStatus() != null) ? cartaoEntity.getStatus() : CartaoStatus.ATIVO );
-            CartaoEntity cartao = cartaoRepository.findById( id ).orElse( new CartaoEntity() );
             cartaoEntity.setCreatedAt(cartao.getCreatedAt());
             cartaoEntity = cartaoRepository.save(cartaoEntity);
             return mapper.map(cartaoEntity, CartaoModel.class);
         }
-        throw new ModelException(CartaoErrors.NOT_FOUND);
+        throw new NotFoundException(CartaoErrors.NOT_FOUND);
     }
 
     public String deleteCartaoById( Long id ) {
@@ -98,7 +99,7 @@ public class CartaoService {
             cartaoRepository.deleteById( id );
             return "Cartão excluído com sucesso.";
         }
-        throw new ModelException(CartaoErrors.NOT_FOUND);
+        throw new NotFoundException(CartaoErrors.NOT_FOUND);
     }
 
     public boolean isCardExist( CartaoEntity cartaoEntity) {
