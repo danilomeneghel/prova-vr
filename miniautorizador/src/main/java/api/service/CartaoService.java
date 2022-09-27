@@ -31,11 +31,8 @@ public class CartaoService {
     private ModelMapper mapper = new ModelMapper();
 
     public String findCartaoByNumeroCartao( String numeroCartao ) {
-        CartaoEntity cartao = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( new CartaoEntity() );
-        while ( cartao.getNumeroCartao() == null ) {
-            throw new NotFoundException(CartaoErrors.INVALID_NUMBER_CARD);
-        }
-        return "R$ " + cartao.getSaldo().getValor();
+        CartaoEntity cartao = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( null );
+        return (cartao != null) ? "R$ " + cartao.getSaldo().getValor() : null;
     }
 
     public CartaoModel findCartaoById( Long id ) {
@@ -82,7 +79,7 @@ public class CartaoService {
         CartaoEntity cartao = cartaoRepository.findById( id ).orElse( new CartaoEntity() );
         while ( cartaoRepository.existsById( id ) ) {
             cartaoEntity.setId(id);
-            SaldoEntity saldoEntity = saldoRepository.findById( cartao.getSaldo().getId() ).orElse( new SaldoEntity() );
+            SaldoEntity saldoEntity = (cartao.getSaldo() != null) ? saldoRepository.findById( cartao.getSaldo().getId() ).orElse( new SaldoEntity() ) : new SaldoEntity();
             cartaoEntity.setSaldo(saldoEntity);
             cartaoEntity.setNumeroCartao( cartaoEntity.getNumeroCartao() );
             cartaoEntity.setSenha( cartaoEntity.getSenha() );
