@@ -32,7 +32,10 @@ public class CartaoService {
 
     public String findCartaoByNumeroCartao( String numeroCartao ) {
         CartaoEntity cartao = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( null );
-        return (cartao != null) ? "R$ " + cartao.getSaldo().getValor() : null;
+        while ( cartao == null ) {
+            throw new NotFoundException(CartaoErrors.INVALID_NUMBER_CARD);
+        }
+        return "R$ " + cartao.getSaldo().getValor();
     }
 
     public CartaoModel findCartaoById( Long id ) {

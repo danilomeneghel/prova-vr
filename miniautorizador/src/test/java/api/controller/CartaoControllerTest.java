@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CartaoControllerTest extends ApplicationTests {
 
+    private static final String URL_API = "/cartoes";
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -30,9 +32,9 @@ public class CartaoControllerTest extends ApplicationTests {
     @Test
     @DisplayName("Cria o Cartão")
     public void testPOSTCard() throws Exception {
-        String data = "{\"numeroCartao\": \"11111111111\", \"senha\": \"222222222\", \"status\": \"ATIVO\"}";
+        String data = "{\"numeroCartao\": \"1010101010\", \"senha\": \"222222222\", \"status\": \"ATIVO\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)
                         .accept(MediaType.APPLICATION_JSON))
@@ -42,39 +44,62 @@ public class CartaoControllerTest extends ApplicationTests {
     @Test
     @DisplayName("Pega todos os Cartões")
     public void testGETCards() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/cartoes"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+        String data = "{\"numeroCartao\": \"2020202020\", \"senha\": \"33333333333\", \"status\": \"ATIVO\"}";
 
-    @Test
-    @DisplayName("Pega o Cartão por Número do Cartão")
-    public void testGETCard() throws Exception {
-        String data = "{\"numeroCartao\": \"22222222\", \"senha\": \"333333333\", \"status\": \"ATIVO\"}";
-
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/cartoes/{numeroCartao}", "22222222"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("Pega o Cartão por Número do Cartão")
+    public void testGETNumberCard() throws Exception {
+        String data = "{\"numeroCartao\": \"3030303030\", \"senha\": \"55555555555\", \"status\": \"ATIVO\"}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/{numeroCartao}", "3030303030"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("Pega o Cartão por ID do Cartão")
+    public void testGETIdCard() throws Exception {
+        String data = "{\"numeroCartao\": \"4040404040\", \"senha\": \"6666666666666\", \"status\": \"ATIVO\"}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/id/{id}", "1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     @DisplayName("Atualiza o Cartão por ID")
     public void testPUTCard() throws Exception {
-        String data = "{\"numeroCartao\": \"44444444\", \"senha\": \"555555555\", \"status\": \"ATIVO\"}";
+        String data = "{\"numeroCartao\": \"5050505050\", \"senha\": \"77777777777\", \"status\": \"ATIVO\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String updated = "{\"numeroCartao\": \"666666666\", \"senha\": \"555555555\", \"status\": \"ATIVO\"}";
+        String updated = "{\"numeroCartao\": \"7777777777\", \"senha\": \"88888888888\", \"status\": \"ATIVO\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/cartoes/{id}", "1")
+        this.mockMvc.perform(MockMvcRequestBuilders.put(URL_API+"/{id}", "1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updated)
                         .accept(MediaType.APPLICATION_JSON))
@@ -83,15 +108,15 @@ public class CartaoControllerTest extends ApplicationTests {
 
     @DisplayName("Exclui o Cartão por ID")
     public void testDELETECard() throws Exception {
-        String data = "{\"numeroCartao\": \"7777777777\", \"senha\": \"8888888888\", \"status\": \"ATIVO\"}";
+        String data = "{\"numeroCartao\": \"6060606060\", \"senha\": \"9999999999999\", \"status\": \"ATIVO\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/cartoes/{id}", "1"))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_API+"/{id}", "1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 

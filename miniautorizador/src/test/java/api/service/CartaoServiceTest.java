@@ -182,7 +182,7 @@ public class CartaoServiceTest extends ApplicationTests {
         try {
             cartaoService.findCartaoByNumeroCartao("555555555");
         } catch (Exception e) {
-            assertEquals(null, e.getMessage());
+            assertEquals("", e.getMessage());
         }
     }
 
