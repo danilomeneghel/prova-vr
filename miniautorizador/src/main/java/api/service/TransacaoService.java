@@ -40,7 +40,7 @@ public class TransacaoService {
     public TransacaoModel findById(Long id ) {
         TransacaoEntity transacao = transacaoRepository.findById( id ).orElse( new TransacaoEntity() );
         while ( transacao.getId() == null ) {
-            throw new NotFoundException(CartaoErrors.NOT_FOUND);
+            throw new NotFoundException(TransacaoErrors.NOT_FOUND);
         }
         return mapper.map(transacao, TransacaoModel.class);
     }
@@ -48,33 +48,29 @@ public class TransacaoService {
     public List<TransacaoModel> findAll() {
         List<TransacaoEntity> transacoes = transacaoRepository.findAll();
         while ( transacoes.isEmpty() ) {
-            throw new NotFoundException(CartaoErrors.NOT_FOUND);
+            throw new NotFoundException(TransacaoErrors.NOT_FOUND);
         }
         return transacoes.stream().map(entity -> mapper.map(entity, TransacaoModel.class)).collect(Collectors.toList());
     }
 
     public TransacaoModel save(TransacaoEntity transacaoEntity) {
-        try {
-            Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.getCartao().getNumeroCartao());
-            while (!cartao.isEmpty()) {
-                while (cartao.get().getStatus().equals(CartaoStatus.ATIVO)) {
-                    while (cartao.get().getSenha().equals(transacaoEntity.getCartao().getSenha())) {
-                        while (cartao.get().getSaldo().getValor().compareTo(transacaoEntity.getValor()) >= 0) {
-                            transacaoEntity.setCartao(cartao.get());
-                            updateBalance(transacaoEntity, cartao);
-                            transacaoEntity = transacaoRepository.save(transacaoEntity);
-                            return mapper.map(transacaoEntity, TransacaoModel.class);
-                        }
-                        throw new BadRequestException(TransacaoErrors.INSUFFICIENT_BALANCE);
+        Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.getCartao().getNumeroCartao());
+        while (!cartao.isEmpty()) {
+            while (cartao.get().getStatus().equals(CartaoStatus.ATIVO)) {
+                while (cartao.get().getSenha().equals(transacaoEntity.getCartao().getSenha())) {
+                    while (cartao.get().getSaldo().getValor().compareTo(transacaoEntity.getValor()) >= 0) {
+                        transacaoEntity.setCartao(cartao.get());
+                        updateBalance(transacaoEntity, cartao);
+                        transacaoEntity = transacaoRepository.save(transacaoEntity);
+                        return mapper.map(transacaoEntity, TransacaoModel.class);
                     }
-                    throw new BadRequestException(TransacaoErrors.INVALID_PASSWORD);
+                    throw new BadRequestException(TransacaoErrors.INSUFFICIENT_BALANCE);
                 }
-                throw new BadRequestException(TransacaoErrors.INATIVE_CARD);
+                throw new BadRequestException(TransacaoErrors.INVALID_PASSWORD);
             }
-            throw new NotFoundException(TransacaoErrors.INVALID_NUMBER_CARD);
-        } catch (Exception e) {
-            throw new BadRequestException(TransacaoErrors.ERROR_CREATING);
+            throw new BadRequestException(TransacaoErrors.INATIVE_CARD);
         }
+        throw new NotFoundException(TransacaoErrors.INVALID_NUMBER_CARD);
     }
 
     public SaldoEntity updateBalance(TransacaoEntity transacaoEntity, Optional<CartaoEntity> cartao) {

@@ -108,10 +108,7 @@ $ ./mvnw test
 
 ## Licença
 
-Projeto licenciado sob <a href="LICENSE">The MIT License (MIT)</a>.<br><br>
-
-
-OBS: Essa prova não foi totalmente finalizada.
+Projeto licenciado sob <a href="LICENSE">The MIT License (MIT)</a>.<br>
 
 
 Desenvolvido por<br>
