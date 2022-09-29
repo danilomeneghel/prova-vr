@@ -7,7 +7,6 @@ import api.enums.CartaoStatus;
 import api.exception.BadRequestException;
 import api.exception.NotFoundException;
 import api.model.TransacaoModel;
-import api.model.errors.CartaoErrors;
 import api.model.errors.TransacaoErrors;
 import api.repository.CartaoRepository;
 import api.repository.SaldoRepository;
@@ -53,7 +52,7 @@ public class TransacaoService {
         return transacoes.stream().map(entity -> mapper.map(entity, TransacaoModel.class)).collect(Collectors.toList());
     }
 
-    public TransacaoModel save(TransacaoEntity transacaoEntity) {
+    public String save(TransacaoEntity transacaoEntity) {
         Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.getCartao().getNumeroCartao());
         while (!cartao.isEmpty()) {
             while (cartao.get().getStatus().equals(CartaoStatus.ATIVO)) {
@@ -62,7 +61,7 @@ public class TransacaoService {
                         transacaoEntity.setCartao(cartao.get());
                         updateBalance(transacaoEntity, cartao);
                         transacaoEntity = transacaoRepository.save(transacaoEntity);
-                        return mapper.map(transacaoEntity, TransacaoModel.class);
+                        return "OK";
                     }
                     throw new BadRequestException(TransacaoErrors.INSUFFICIENT_BALANCE);
                 }

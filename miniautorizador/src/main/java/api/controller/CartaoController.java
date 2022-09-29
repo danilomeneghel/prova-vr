@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class CartaoController {
     private CartaoService cartaoService;
 
     @GetMapping( value = "/{numeroCartao}" )
-    public ResponseEntity< String > getCardByNumber(@PathVariable String numeroCartao) {
+    public ResponseEntity< BigDecimal > getCardByNumber(@PathVariable String numeroCartao) {
         return new ResponseEntity< >(cartaoService.findCartaoByNumeroCartao(numeroCartao), HttpStatus.OK);
     }
 

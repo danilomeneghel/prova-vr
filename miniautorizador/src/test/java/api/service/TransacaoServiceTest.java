@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -78,12 +78,10 @@ public class TransacaoServiceTest extends ApplicationTests {
 
         when(transacaoRepository.save(any(TransacaoEntity.class))).thenReturn(mockTransacaoEntity);
 
-        TransacaoModel saveTransacaoModel = transacaoService.save(mockTransacaoEntity);
-        TransacaoEntity transacaoEntity = mapper.map(saveTransacaoModel, TransacaoEntity.class);
-        transacaoEntity.setCartao(mockTransacaoEntity.getCartao());
+        String salvaTransacao = transacaoService.save(mockTransacaoEntity);
 
-        Assertions.assertNotNull(transacaoEntity);
-        assertEquals(mockTransacaoEntity, transacaoEntity);
+        Assertions.assertNotNull(salvaTransacao);
+        assertEquals("OK", salvaTransacao);
     }
 
     @Test
@@ -147,8 +145,7 @@ public class TransacaoServiceTest extends ApplicationTests {
                                 .build())
                 .collect(Collectors.toList());
 
-        List<TransacaoEntity> listaVazia = Collections.nCopies(0, (TransacaoEntity) null);
-        when(transacaoRepository.findAll()).thenReturn(listaVazia);
+        when(transacaoRepository.findAll()).thenReturn(new ArrayList<>());
 
         try {
             List< TransacaoModel > transacoes = transacaoService.findAll();

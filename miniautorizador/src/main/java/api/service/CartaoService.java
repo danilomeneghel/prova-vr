@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,12 +31,12 @@ public class CartaoService {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public String findCartaoByNumeroCartao( String numeroCartao ) {
+    public BigDecimal findCartaoByNumeroCartao(String numeroCartao ) {
         CartaoEntity cartao = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( null );
         while ( cartao == null ) {
             throw new NotFoundException(CartaoErrors.INVALID_NUMBER_CARD);
         }
-        return "R$ " + cartao.getSaldo().getValor();
+        return cartao.getSaldo().getValor();
     }
 
     public CartaoModel findCartaoById( Long id ) {

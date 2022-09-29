@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -162,10 +163,10 @@ public class CartaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.findByNumeroCartao("1111111111")).thenReturn(Optional.of(mockCartaoEntity));
 
-        String findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
+        BigDecimal findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
 
         Assertions.assertNotNull(findCartao);
-        assertEquals("R$ " + mockCartaoEntity.getSaldo().getValor(), findCartao);
+        assertEquals(mockCartaoEntity.getSaldo().getValor(), findCartao);
     }
 
     @Test

@@ -33,7 +33,7 @@ public class TransacaoController {
     }
 
     @PostMapping
-    public ResponseEntity<TransacaoModel> createTransaction(@Valid @RequestBody TransacaoEntity transacaoEntity) {
+    public ResponseEntity< String > createTransaction(@Valid @RequestBody TransacaoEntity transacaoEntity) {
         return new ResponseEntity< >(transacaoService.save(transacaoEntity), HttpStatus.CREATED );
     }
 
