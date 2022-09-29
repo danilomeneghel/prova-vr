@@ -87,15 +87,27 @@ http://localhost:8080/swagger-ui.html
 
 ## SonarQube
 
-Para verificar a cobertura de testes, execute o seguinte comando: 
+Para verificar a cobertura de testes, primeiro acesse o seguinte endereço: <br>
+http://localhost:9000
+
+Depois efetue o login preenchendo "admin" no usuário e senha (login padrão). <br>
+Ao se logar crie um novo projeto e gere o token.
+
+Feito isso, entre no container criado da api:
 
 ```
-$ ./mvnw clean install sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=YOUR_TOKEN
+$ docker exec -it api bash
+```
+
+Execute o seguinte comando do sonar:
+
+```
+$ ./mvnw clean verify sonar:sonar -Dsonar.projectKey=NOME_PROJETO_GERADO -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=TOKEN_GERADO
 ```
 
 Após executado, acesse o seguinte endereço: <br>
 
-http://localhost:9000/dashboard?id=api%3Aprova-vr
+http://localhost:9000/dashboard?id=prova-vr
 
 ## Testes
 
