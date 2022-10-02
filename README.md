@@ -39,15 +39,7 @@ $ cd prova-vr
 
 ## Docker
 
-Para rodar o projeto via Docker, bastar executar o seguinte comando:
-
-```
-$ cd miniautorizador
-$ docker build -t projeto .
-$ docker run -p 8080:8080 -d projeto
-```
-
-Ou via Docker-Compose:
+Para rodar o projeto via Docker-Compose, bastar executar o seguinte comando:
 
 ```
 $ cd docker
@@ -120,7 +112,7 @@ $ ./mvnw test
 
 ## Licença
 
-Projeto licenciado sob <a href="LICENSE">The MIT License (MIT)</a>.<br>
+Projeto licenciado sob <a href="LICENSE">The MIT License (MIT)</a>.<br><br>
 
 
 Desenvolvido por<br>
