@@ -1,6 +1,6 @@
 package api.controller;
 
-import api.entity.TransacaoEntity;
+import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.service.TransacaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,8 +33,8 @@ public class TransacaoController {
     }
 
     @PostMapping
-    public ResponseEntity< String > createTransaction(@Valid @RequestBody TransacaoEntity transacaoEntity) {
-        return new ResponseEntity< >(transacaoService.save(transacaoEntity), HttpStatus.CREATED );
+    public ResponseEntity< String > createTransaction(@Valid @RequestBody CriaTransacaoModel criaTransacaoModel) {
+        return new ResponseEntity< >(transacaoService.save(criaTransacaoModel), HttpStatus.CREATED );
     }
 
     @DeleteMapping( value = "/{id}" )

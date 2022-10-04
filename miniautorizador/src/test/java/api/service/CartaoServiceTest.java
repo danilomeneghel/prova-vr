@@ -6,6 +6,7 @@ import api.entity.SaldoEntity;
 import api.enums.CartaoStatus;
 import api.exception.NotFoundException;
 import api.model.CartaoModel;
+import api.model.CriaCartaoModel;
 import api.repository.CartaoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -40,20 +41,20 @@ public class CartaoServiceTest extends ApplicationTests {
     @Test
     @DisplayName("Cria o Cartão com sucesso")
     void testSaveCartao() throws NotFoundException {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+        CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
                 .numeroCartao("1111111111")
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
+                .senha(null)
                 .build();
 
-        when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(mockCartaoEntity);
+        CartaoEntity cartaoEntity = mapper.map(mockCartaoModel, CartaoEntity.class);
 
-        CartaoModel saveCartaoModel = cartaoService.save(mockCartaoEntity);
-        CartaoEntity cartaoEntity = mapper.map(saveCartaoModel, CartaoEntity.class);
-        cartaoEntity.setSaldo(mockCartaoEntity.getSaldo());
+        when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(cartaoEntity);
+
+        CartaoModel saveCartaoModel = cartaoService.save(mockCartaoModel);
+        CriaCartaoModel criaCartaoModel = mapper.map(saveCartaoModel, CriaCartaoModel.class);
 
         Assertions.assertNotNull(cartaoEntity);
-        assertEquals(mockCartaoEntity, cartaoEntity);
+        assertEquals(mockCartaoModel, criaCartaoModel);
     }
 
     @Test

@@ -7,6 +7,7 @@ import api.exception.BadRequestException;
 import api.exception.NotFoundException;
 import api.exception.UnprocessableEntityException;
 import api.model.CartaoModel;
+import api.model.CriaCartaoModel;
 import api.model.errors.CartaoErrors;
 import api.repository.CartaoRepository;
 import api.repository.SaldoRepository;
@@ -63,7 +64,8 @@ public class CartaoService {
         return cartoes.stream().map(entity -> mapper.map(entity, CartaoModel.class)).collect(Collectors.toList());
     }
 
-    public CartaoModel save(CartaoEntity cartaoEntity) {
+    public CartaoModel save(CriaCartaoModel criaCartaoModel) {
+        CartaoEntity cartaoEntity = mapper.map(criaCartaoModel, CartaoEntity.class);
         while ( isCardExist(cartaoEntity) ) {
             throw new UnprocessableEntityException(CartaoErrors.CARD_EXISTS);
         }

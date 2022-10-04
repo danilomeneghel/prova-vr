@@ -4,6 +4,7 @@ import api.entity.CartaoEntity;
 import api.enums.CartaoStatus;
 import api.exception.NotFoundException;
 import api.model.CartaoModel;
+import api.model.CriaCartaoModel;
 import api.service.CartaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,8 @@ public class CartaoController {
     }
 
     @PostMapping
-    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CartaoEntity cartaoEntity) throws NotFoundException {
-        return new ResponseEntity< >(cartaoService.save(cartaoEntity), HttpStatus.CREATED );
+    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CriaCartaoModel criaCartaoModel) throws NotFoundException {
+        return new ResponseEntity< >(cartaoService.save(criaCartaoModel), HttpStatus.CREATED );
     }
 
     @PutMapping( value = "/{id}" )

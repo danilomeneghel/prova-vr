@@ -44,7 +44,7 @@ public class TransacaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"cartao\": {\"id\": \"1\",\"numeroCartao\": \"11111111111\",\"senha\": \"222222222\",\"saldo\": {\"id\": \"1\",\"valor\": \"500\"},\"status\": \"ATIVO\"},\"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"11111111111\", \"senha\": \"222222222\", \"valor\": \"10.20\"}";
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
@@ -55,7 +55,7 @@ public class TransacaoControllerTest extends ApplicationTests {
     }
 
     @Test
-    @DisplayName("Pega todos os Cartões")
+    @DisplayName("Pega todas as Transações")
     public void testGETTransactions() throws Exception {
         String cartao = "{\"numeroCartao\": \"22222222222\", \"senha\": \"333333333333\", \"status\": \"ATIVO\"}";
 
@@ -66,9 +66,15 @@ public class TransacaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"cartao\": {\"id\": \"1\",\"numeroCartao\": \"22222222222\",\"senha\": \"333333333333\",\"saldo\": {\"id\": \"1\",\"valor\": \"500\"},\"status\": \"ATIVO\"},\"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"22222222222\", \"senha\": \"333333333333\", \"valor\": \"10.20\"}";
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
         this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -85,9 +91,15 @@ public class TransacaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"cartao\": {\"id\": \"1\",\"numeroCartao\": \"333333333333\",\"senha\": \"444444444444\",\"saldo\": {\"id\": \"1\",\"valor\": \"500\"},\"status\": \"ATIVO\"},\"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"333333333333\", \"senha\": \"444444444444\", \"valor\": \"10.20\"}";
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
         this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/{id}", "1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -103,9 +115,15 @@ public class TransacaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"cartao\": {\"id\": \"1\",\"numeroCartao\": \"555555555555\",\"senha\": \"66666666666\",\"saldo\": {\"id\": \"1\",\"valor\": \"500\"},\"status\": \"ATIVO\"},\"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"555555555555\", \"senha\": \"66666666666\", \"valor\": \"10.20\"}";
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
         this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_API+"/{id}", "1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }

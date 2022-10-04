@@ -6,6 +6,7 @@ import api.entity.SaldoEntity;
 import api.entity.TransacaoEntity;
 import api.enums.CartaoStatus;
 import api.exception.NotFoundException;
+import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.repository.CartaoRepository;
 import api.repository.SaldoRepository;
@@ -71,14 +72,15 @@ public class TransacaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.findByNumeroCartao("110110110110110")).thenReturn(Optional.of(mockCartaoEntity));
 
-        TransacaoEntity mockTransacaoEntity = TransacaoEntity.builder()
-                .cartao(mockCartaoEntity)
+        CriaTransacaoModel mockTransacaoModel = CriaTransacaoModel.builder()
+                .numeroCartao(mockCartaoEntity.getNumeroCartao())
+                .senha(mockCartaoEntity.getSenha())
                 .valor(BigDecimal.valueOf(10.50))
                 .build();
 
-        when(transacaoRepository.save(any(TransacaoEntity.class))).thenReturn(mockTransacaoEntity);
+        when(transacaoRepository.save(any(TransacaoEntity.class))).thenReturn(mapper.map(mockTransacaoModel, TransacaoEntity.class));
 
-        String salvaTransacao = transacaoService.save(mockTransacaoEntity);
+        String salvaTransacao = transacaoService.save(mockTransacaoModel);
 
         Assertions.assertNotNull(salvaTransacao);
         assertEquals("OK", salvaTransacao);
@@ -225,9 +227,15 @@ public class TransacaoServiceTest extends ApplicationTests {
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao("440440440440440")).thenReturn(Optional.of(mockCartaoEntity));
 
-        when(transacaoRepository.existsById(1L)).thenReturn(true);
+        TransacaoEntity mockTransacaoEntity = TransacaoEntity.builder()
+                .id(1L)
+                .cartao(mockCartaoEntity)
+                .valor(BigDecimal.valueOf(10.50))
+                .build();
+
+        when(transacaoRepository.findById(1L)).thenReturn(Optional.of(mockTransacaoEntity));
 
         String deleteTransacao = transacaoService.deleteById(1L);
 

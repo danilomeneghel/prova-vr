@@ -6,6 +6,7 @@ import api.entity.TransacaoEntity;
 import api.enums.CartaoStatus;
 import api.exception.BadRequestException;
 import api.exception.NotFoundException;
+import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.model.errors.TransacaoErrors;
 import api.repository.CartaoRepository;
@@ -52,15 +53,16 @@ public class TransacaoService {
         return transacoes.stream().map(entity -> mapper.map(entity, TransacaoModel.class)).collect(Collectors.toList());
     }
 
-    public String save(TransacaoEntity transacaoEntity) {
-        Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.getCartao().getNumeroCartao());
+    public String save(CriaTransacaoModel criaTransacaoModel) {
+        Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(criaTransacaoModel.getNumeroCartao());
         while (!cartao.isEmpty()) {
             while (cartao.get().getStatus().equals(CartaoStatus.ATIVO)) {
-                while (cartao.get().getSenha().equals(transacaoEntity.getCartao().getSenha())) {
-                    while (cartao.get().getSaldo().getValor().compareTo(transacaoEntity.getValor()) >= 0) {
+                while (cartao.get().getSenha().equals(criaTransacaoModel.getSenha())) {
+                    while (cartao.get().getSaldo().getValor().compareTo(criaTransacaoModel.getValor()) >= 0) {
+                        updateBalance(cartao, criaTransacaoModel.getValor(), "debito");
+                        TransacaoEntity transacaoEntity = mapper.map(criaTransacaoModel, TransacaoEntity.class);
                         transacaoEntity.setCartao(cartao.get());
-                        updateBalance(transacaoEntity, cartao);
-                        transacaoEntity = transacaoRepository.save(transacaoEntity);
+                        transacaoRepository.save(transacaoEntity);
                         return "OK";
                     }
                     throw new BadRequestException(TransacaoErrors.INSUFFICIENT_BALANCE);
@@ -72,16 +74,19 @@ public class TransacaoService {
         throw new NotFoundException(TransacaoErrors.INVALID_NUMBER_CARD);
     }
 
-    public SaldoEntity updateBalance(TransacaoEntity transacaoEntity, Optional<CartaoEntity> cartao) {
+    public SaldoEntity updateBalance(Optional<CartaoEntity> cartao, BigDecimal valorTransacao, String tipo) {
         Optional<SaldoEntity> saldoEntity = saldoRepository.findById(cartao.get().getSaldo().getId());
-        BigDecimal novoValor = saldoEntity.get().getValor().subtract(transacaoEntity.getValor());
+        BigDecimal novoValor = (tipo.equals("debito")) ? saldoEntity.get().getValor().subtract(valorTransacao) : saldoEntity.get().getValor().add(valorTransacao);
         saldoEntity.get().setValor(novoValor);
         return saldoRepository.save(saldoEntity.get());
     }
 
     public String deleteById(Long id ) {
-        while ( transacaoRepository.existsById( id ) ) {
+        Optional<TransacaoEntity> transacaoEntity = transacaoRepository.findById(id);
+        while ( transacaoEntity.isPresent() ) {
+            Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.get().getCartao().getNumeroCartao());
             transacaoRepository.deleteById( id );
+            updateBalance(cartao, transacaoEntity.get().getValor(), "credito");
             return "Transação excluída com sucesso.";
         }
         throw new NotFoundException(TransacaoErrors.NOT_FOUND);
