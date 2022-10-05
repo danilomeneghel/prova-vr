@@ -1,5 +1,5 @@
-# select image maven and openjdk
-FROM sgurumukhi/maven-openjdk-17-slim:3.6.3
+# select image maven and jdk
+FROM maven:3.8.6-amazoncorretto-17
 
 # copy the source tree and the pom.xml to our new container
 COPY ./ ./
