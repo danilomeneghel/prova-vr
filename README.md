@@ -39,7 +39,7 @@ $ cd prova-vr
 
 ## Docker
 
-Para rodar o projeto via Docker-Compose, bastar executar o seguinte comando:
+Para rodar o projeto via Docker-Compose digite:
 
 ```
 $ cd docker
@@ -55,6 +55,14 @@ Para encerrar tudo digite:
 $ docker-compose down
 ```
 
+Caso queira rodar diretamente via Dockerfile, bastar executar os seguintes comandos: <br>
+
+```
+$ docker run --name mysql -p 3306:3306 -e MYSQL_DATABASE="miniautorizador" -e MYSQL_ROOT_PASSWORD= -e MYSQL_ALLOW_EMPTY_PASSWORD="yes" -d mysql:latest
+$ docker build -t projeto .
+$ docker run --name api-vr -p 8080:8080 -d projeto
+```
+
 ## Maven
 
 Para carregar o projeto diretamente com Maven será necessário mudar a configuração do banco. <br>
@@ -63,13 +71,17 @@ Após feito isso, digite no terminal:
 
 ```
 $ cd miniautorizador
-$ ./mvnw clean spring-boot:run
+$ mvn clean spring-boot:run
 ```
 
 Aguarde carregar todo o serviço web. <br>
-Após concluído, digite o endereço abaixo em seu navegador, nele será listado os cartões cadastrados na API. <br>
+Após concluído, digite um dos endereços abaixo em seu navegador. <br>
 
+Listar cartões cadastrados:
 http://localhost:8080/cartoes
+
+Listar transações cadastradas:
+http://localhost:8080/transacoes
 
 ## Swagger 
 
@@ -94,7 +106,7 @@ $ docker exec -it api bash
 Execute o seguinte comando do sonar:
 
 ```
-$ ./mvnw clean verify sonar:sonar -Dsonar.projectKey=NOME_PROJETO_GERADO -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=TOKEN_GERADO
+$ mvn clean verify sonar:sonar -Dsonar.projectKey=NOME_PROJETO_GERADO -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=TOKEN_GERADO
 ```
 
 Após executado, acesse o seguinte endereço: <br>
@@ -107,7 +119,7 @@ Para realizar os testes, execute o seguinte comando no terminal:
 
 ```
 $ cd miniautorizador
-$ ./mvnw test
+$ mvn test
 ```
 
 ## Licença

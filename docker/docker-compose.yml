@@ -33,7 +33,6 @@ services:
   api:
     container_name: api
     build: ../miniautorizador/
-    command: ./mvnw clean spring-boot:run -DskipTests
     ports:
       - "8080:8080"
     volumes:
