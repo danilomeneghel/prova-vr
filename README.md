@@ -41,23 +41,20 @@ $ cd prova-vr
 ## Maven
 
 Para rodar o projeto com Maven, é necessário ter a versão 3.8.6 instalada.<br>
-Além disso, é preciso ter o Java 17 e o MySql 8 instalado.<br><br>
+Além disso, é preciso ter o Java 17 e o MySql 8 instalado.<br>
 
 Tendo tudo instalado e rodando localmente, basta executar o seguinte comando:
 
 ```
 $ cd miniautorizador
-$ mvn clean spring-boot:run
+$ mvn clean spring-boot:run -Dspring.profiles.active=dev
 ```
 
 Caso não tenha o Maven instalado ou tenha outra versão, pode usar o comando ./mvnw (no Linux) ou mvnw.cmd (no Windows).
 
 ## Docker (Opcional)
 
-Para rodar o projeto via Docker-Compose, é preciso primeiro ajustar o arquivo application.properties. <br>
-Onde está escrito "jdbc:mysql://localhost" mude para "jdbc:mysql://mysql", para acessar o MySql do container. <br><br>
-
-Feito isso, basta apenas executar o comando:
+Para rodar o projeto via Docker-Compose, basta apenas executar o comando:
 
 ```
 $ cd docker

@@ -34,6 +34,7 @@ services:
   api:
     container_name: api
     build: ../miniautorizador/
+    command: mvn clean spring-boot:run -Dspring.profiles.active=docker
     ports:
       - "8080:8080"
     volumes:
