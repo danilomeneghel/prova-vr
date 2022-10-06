@@ -47,14 +47,14 @@ Tendo tudo instalado e rodando localmente, basta executar o seguinte comando:
 
 ```
 $ cd miniautorizador
-$ mvn clean spring-boot:run -Dspring.profiles.active=dev
+$ mvn clean spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 Caso não tenha o Maven instalado ou tenha outra versão, pode usar o comando ./mvnw (no Linux) ou mvnw.cmd (no Windows).
 
 ## Docker (Opcional)
 
-Para rodar o projeto via Docker-Compose, basta apenas executar o comando:
+Para rodar o projeto via Docker-Compose, basta executar o comando:
 
 ```
 $ cd docker
