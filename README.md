@@ -13,8 +13,9 @@ Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Sp
 ## Requisitos
 
 - Java JDK 17
-- Apache Maven >= 3.8.6 (Opcional)
-- Docker
+- Apache Maven >= 3.8.6
+- MySql 8
+- Docker (Opcional)
 
 ## Tecnologias
 
@@ -37,9 +38,26 @@ $ git clone https://github.com/danilomeneghel/prova-vr.git
 $ cd prova-vr
 ```
 
-## Docker
+## Maven
 
-Para rodar o projeto via Docker-Compose digite:
+Para rodar o projeto com Maven, é necessário ter a versão 3.8.6 instalada.<br>
+Além disso, é preciso ter o Java 17 e o MySql 8 instalado.<br><br>
+
+Tendo tudo instalado e rodando localmente, basta executar o seguinte comando:
+
+```
+$ cd miniautorizador
+$ mvn clean spring-boot:run
+```
+
+Caso não tenha o Maven instalado ou tenha outra versão, pode usar o comando ./mvnw (no Linux) ou mvnw.cmd (no Windows).
+
+## Docker (Opcional)
+
+Para rodar o projeto via Docker-Compose, é preciso primeiro ajustar o arquivo application.properties. <br>
+Onde está escrito "jdbc:mysql://localhost" mude para "jdbc:mysql://mysql", para acessar o MySql do container. <br><br>
+
+Feito isso, basta apenas executar o comando:
 
 ```
 $ cd docker
@@ -55,32 +73,13 @@ Para encerrar tudo digite:
 $ docker-compose down
 ```
 
-Caso queira rodar diretamente via Dockerfile, bastar executar os seguintes comandos: <br>
-
-```
-$ docker run --name mysql -p 3306:3306 -e MYSQL_DATABASE="miniautorizador" -e MYSQL_ROOT_PASSWORD= -e MYSQL_ALLOW_EMPTY_PASSWORD="yes" -d mysql:latest
-$ docker build -t projeto .
-$ docker run --name api-vr -p 8080:8080 -d projeto
-```
-
-## Maven
-
-Para carregar o projeto diretamente com Maven será necessário mudar a configuração do banco. <br>
-Onde está escrito "jdbc:mysql://mysql" mude para "jdbc:mysql://localhost", para acessar o MySql Local. <br>
-Após feito isso, digite no terminal:
-
-```
-$ cd miniautorizador
-$ mvn clean spring-boot:run
-```
-
 Aguarde carregar todo o serviço web. <br>
 Após concluído, digite um dos endereços abaixo em seu navegador. <br>
 
-Listar cartões cadastrados:
+Listar cartões cadastrados: <br>
 http://localhost:8080/cartoes
 
-Listar transações cadastradas:
+Listar transações cadastradas: <br>
 http://localhost:8080/transacoes
 
 ## Swagger 
