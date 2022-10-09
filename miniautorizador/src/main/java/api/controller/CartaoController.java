@@ -2,7 +2,6 @@ package api.controller;
 
 import api.entity.CartaoEntity;
 import api.enums.CartaoStatus;
-import api.exception.NotFoundException;
 import api.model.CartaoModel;
 import api.model.CriaCartaoModel;
 import api.service.CartaoService;
@@ -47,17 +46,17 @@ public class CartaoController {
     }
 
     @PostMapping
-    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CriaCartaoModel criaCartaoModel) throws NotFoundException {
+    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CriaCartaoModel criaCartaoModel) {
         return new ResponseEntity< >(cartaoService.save(criaCartaoModel), HttpStatus.CREATED );
     }
 
     @PutMapping( value = "/{id}" )
-    public ResponseEntity< CartaoModel > updateCard( @PathVariable( "id" ) Long id, @Valid @RequestBody CartaoEntity cartaoEntity) throws NotFoundException {
+    public ResponseEntity< CartaoModel > updateCard( @PathVariable( "id" ) Long id, @Valid @RequestBody CartaoEntity cartaoEntity) {
         return new ResponseEntity< >(cartaoService.update( id, cartaoEntity), HttpStatus.OK );
     }
 
     @DeleteMapping( value = "/{id}" )
-    public ResponseEntity< String > deleteCard( @PathVariable( "id" ) Long id ) throws NotFoundException {
+    public ResponseEntity< String > deleteCard( @PathVariable( "id" ) Long id ) {
         return new ResponseEntity< >( cartaoService.deleteCartaoById( id ), HttpStatus.OK );
     }
 

@@ -4,8 +4,7 @@ import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.entity.TransacaoEntity;
 import api.enums.CartaoStatus;
-import api.exception.BadRequestException;
-import api.exception.NotFoundException;
+import api.exception.ModelException;
 import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.model.errors.TransacaoErrors;
@@ -40,7 +39,7 @@ public class TransacaoService {
     public TransacaoModel findById(Long id ) {
         TransacaoEntity transacao = transacaoRepository.findById( id ).orElse( new TransacaoEntity() );
         while ( transacao.getId() == null ) {
-            throw new NotFoundException(TransacaoErrors.NOT_FOUND);
+            throw new ModelException(TransacaoErrors.NOT_FOUND);
         }
         return mapper.map(transacao, TransacaoModel.class);
     }
@@ -48,7 +47,7 @@ public class TransacaoService {
     public List<TransacaoModel> findAll() {
         List<TransacaoEntity> transacoes = transacaoRepository.findAll();
         while ( transacoes.isEmpty() ) {
-            throw new NotFoundException(TransacaoErrors.NOT_FOUND);
+            throw new ModelException(TransacaoErrors.NOT_FOUND);
         }
         return transacoes.stream().map(entity -> mapper.map(entity, TransacaoModel.class)).collect(Collectors.toList());
     }
@@ -65,13 +64,13 @@ public class TransacaoService {
                         transacaoRepository.save(transacaoEntity);
                         return "OK";
                     }
-                    throw new BadRequestException(TransacaoErrors.INSUFFICIENT_BALANCE);
+                    throw new ModelException(TransacaoErrors.INSUFFICIENT_BALANCE);
                 }
-                throw new BadRequestException(TransacaoErrors.INVALID_PASSWORD);
+                throw new ModelException(TransacaoErrors.INVALID_PASSWORD);
             }
-            throw new BadRequestException(TransacaoErrors.INATIVE_CARD);
+            throw new ModelException(TransacaoErrors.INATIVE_CARD);
         }
-        throw new NotFoundException(TransacaoErrors.INVALID_NUMBER_CARD);
+        throw new ModelException(TransacaoErrors.INVALID_NUMBER_CARD);
     }
 
     public SaldoEntity updateBalance(Optional<CartaoEntity> cartao, BigDecimal valorTransacao, String tipo) {
@@ -89,7 +88,7 @@ public class TransacaoService {
             updateBalance(cartao, transacaoEntity.get().getValor(), "credito");
             return "Transação excluída com sucesso.";
         }
-        throw new NotFoundException(TransacaoErrors.NOT_FOUND);
+        throw new ModelException(TransacaoErrors.NOT_FOUND);
     }
 
 }

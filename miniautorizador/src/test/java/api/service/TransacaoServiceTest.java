@@ -5,7 +5,6 @@ import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.entity.TransacaoEntity;
 import api.enums.CartaoStatus;
-import api.exception.NotFoundException;
 import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.repository.CartaoRepository;
@@ -61,7 +60,7 @@ public class TransacaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Cria a Transação com sucesso")
-    void testSaveTransacao() throws NotFoundException {
+    void testSaveTransacao() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("110110110110110")
@@ -88,7 +87,7 @@ public class TransacaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza todas as Transações com sucesso")
-    void testFindAll() throws NotFoundException {
+    void testFindAll() {
         SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
@@ -123,7 +122,7 @@ public class TransacaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza todas as Transações inválidas")
-    void testFindAllInvalid() throws NotFoundException {
+    void testFindAllInvalid() {
         SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
@@ -162,7 +161,7 @@ public class TransacaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza a Transação por ID com sucesso")
-    void testFindTransacaoById() throws NotFoundException {
+    void testFindTransacaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("220220220220220")
@@ -190,7 +189,7 @@ public class TransacaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Transação por ID inválido")
-    void testFindTransacaoByIdInvalid() throws NotFoundException {
+    void testFindTransacaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("330330330330330")
@@ -218,7 +217,7 @@ public class TransacaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Exclui o Transação por ID com sucesso")
-    void testDeleteTransacaoById() throws NotFoundException {
+    void testDeleteTransacaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("440440440440440")

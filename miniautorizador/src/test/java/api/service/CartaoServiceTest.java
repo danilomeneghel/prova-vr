@@ -4,7 +4,6 @@ import api.ApplicationTests;
 import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.enums.CartaoStatus;
-import api.exception.NotFoundException;
 import api.model.CartaoModel;
 import api.model.CriaCartaoModel;
 import api.repository.CartaoRepository;
@@ -40,7 +39,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Cria o Cartão com sucesso")
-    void testSaveCartao() throws NotFoundException {
+    void testSaveCartao() {
         CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
                 .numeroCartao("1111111111")
                 .senha(null)
@@ -117,7 +116,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por ID com sucesso")
-    void testFindCartaoById() throws NotFoundException {
+    void testFindCartaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("1111111111")
@@ -136,7 +135,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por ID inválido")
-    void testFindCartaoByIdInvalid() throws NotFoundException {
+    void testFindCartaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
                 .numeroCartao("1111111111")
@@ -155,7 +154,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por Número do Cartão com sucesso")
-    void testFindCartaoByNumber() throws NotFoundException {
+    void testFindCartaoByNumber() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .saldo(saldo)
@@ -172,7 +171,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Localiza o Cartão por Número do Cartão inválido")
-    void testFindCartaoByNumberInvalid() throws NotFoundException {
+    void testFindCartaoByNumberInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .saldo(saldo)
@@ -190,7 +189,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Altera o Cartão por ID com sucesso")
-    void testUpdateCartao() throws NotFoundException {
+    void testUpdateCartao() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("xxxxxxxx")
@@ -236,7 +235,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
     @Test
     @DisplayName("Exclui o Cartão por ID com sucesso")
-    void testDeleteCartaoById() throws NotFoundException {
+    void testDeleteCartaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .numeroCartao("1111111111")
                 .senha("2222222222")
