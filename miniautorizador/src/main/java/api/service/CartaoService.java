@@ -63,10 +63,8 @@ public class CartaoService {
                     throw new ModelException(CartaoErrors.CARD_EXISTS);
                 });
         Optional.of(cartaoEntity.getNumeroCartao())
-                .filter(numero -> numero == 0)
-                .ifPresent(numero -> {
-                    throw new ModelException(CartaoErrors.INVALID_NUMBER_CARD);
-                });
+                .filter(numero -> numero.toString().length() >= 13 && numero.toString().length() <= 19)
+                .orElseThrow(() -> new ModelException(CartaoErrors.INVALID_NUMBER_CARD));
         try {
             SaldoEntity saldoEntity = new SaldoEntity();
             saldoRepository.save(saldoEntity);

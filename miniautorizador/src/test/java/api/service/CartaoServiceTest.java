@@ -183,7 +183,7 @@ public class CartaoServiceTest extends ApplicationTests {
         try {
             cartaoService.findCartaoByNumeroCartao(Long.valueOf("5555555555555555"));
         } catch (Exception e) {
-            assertEquals("", e.getMessage());
+            assertEquals("Número de cartão inválido", e.getMessage());
         }
     }
 

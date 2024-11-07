@@ -46,7 +46,7 @@ public class CartaoController {
     }
 
     @PostMapping
-    public ResponseEntity< CartaoModel > createCard( @Valid @RequestBody CriaCartaoModel criaCartaoModel) {
+    public ResponseEntity< CartaoModel > createCard( @RequestBody @Valid CriaCartaoModel criaCartaoModel) {
         return new ResponseEntity< >(cartaoService.save(criaCartaoModel), HttpStatus.CREATED );
     }
 
