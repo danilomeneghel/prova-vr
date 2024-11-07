@@ -48,16 +48,8 @@ Tendo tudo instalado e rodando localmente, basta executar o seguinte comando:
 
 ```
 $ cd miniautorizador
-$ mvn install
-$ mvn clean spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-Se não funcionar com o comando acima, poderá utilizar o seguinte comando:
-
-```
-$ cd miniautorizador
-$ mvn clean package
-$ java -jar target/prova-vr-2.1.jar
+$ mvn clean install -U
+$ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 Caso não tenha o Maven instalado ou tenha outra versão, pode usar o comando ./mvnw (no Linux) ou mvnw.cmd (no Windows).
@@ -94,6 +86,10 @@ http://localhost:8080/transacoes
 Documentação da API RESTful: <br>
 
 http://localhost:8080/swagger-ui.html
+
+Login:
+  - Usuário: username
+  - Senha: password
 
 ## SonarQube
 
