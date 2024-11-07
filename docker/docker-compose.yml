@@ -1,0 +1,44 @@
+version: "3.7"
+services:
+  #  mongo:
+  #    image: mongo:4.2
+  #    hostname: mongo
+  #    container_name: mongo
+  #    ports:
+  #      - 27017:27017
+  #    environment:
+  #      MONGO_INITDB_DATABASE: miniautorizador
+  #      MONGO_INITDB_ROOT_USERNAME: user
+  #      MONGO_INITDB_ROOT_PASSWORD: password
+  #    volumes:
+  #      - ./scripts/init.js:/docker-entrypoint-initdb.d/init.js:ro
+  mysql:
+    image: mysql:8
+    hostname: mysql
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_HOST: localhost
+      MYSQL_DATABASE: miniautorizador
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./:/mysql
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+  api:
+    container_name: api
+    build: ../miniautorizador/
+    command: mvn clean spring-boot:run -Dspring-boot.run.profiles=docker
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../:/spring-boot-api
+    depends_on:
+      - sonarqube
+      - mysql
