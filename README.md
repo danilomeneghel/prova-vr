@@ -6,6 +6,7 @@ Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Sp
 
 - CRUD
 - API RESTful
+- Basic Auth
 - Validation
 - Enum
 - Exception
@@ -131,6 +132,10 @@ Swagger-UI <br>
 
 Modelagem ER <br>
 ![Screenshots](screenshots/screenshot02.png) <br><br>
+
+Testes Unitários <br>
+![Screenshots](screenshots/screenshot03.png) <br><br>
+
 
 ## Licença
 
