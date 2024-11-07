@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CriaTransacaoModel {
 
-    private String numeroCartao;
+    private Long numeroCartao;
 
     private String senha;
 

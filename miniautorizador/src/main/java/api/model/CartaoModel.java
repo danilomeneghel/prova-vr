@@ -20,7 +20,7 @@ public class CartaoModel {
 
     private Long id;
 
-    private String numeroCartao;
+    private Long numeroCartao;
 
     private SaldoModel saldo;
 

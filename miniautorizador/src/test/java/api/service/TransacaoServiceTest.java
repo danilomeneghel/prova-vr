@@ -63,13 +63,13 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testSaveTransacao() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("110110110110110")
+                .numeroCartao(Long.valueOf("110110110110110"))
                 .senha("aaaaaaaaaaa")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao("110110110110110")).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao(Long.valueOf("110110110110110"))).thenReturn(Optional.of(mockCartaoEntity));
 
         CriaTransacaoModel mockTransacaoModel = CriaTransacaoModel.builder()
                 .numeroCartao(mockCartaoEntity.getNumeroCartao())
@@ -91,7 +91,7 @@ public class TransacaoServiceTest extends ApplicationTests {
         SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("220220220220220")
+                .numeroCartao(Long.valueOf("220220220220220"))
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -126,7 +126,7 @@ public class TransacaoServiceTest extends ApplicationTests {
         SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("220220220220220")
+                .numeroCartao(Long.valueOf("220220220220220"))
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -164,7 +164,7 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testFindTransacaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("220220220220220")
+                .numeroCartao(Long.valueOf("220220220220220"))
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -192,7 +192,7 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testFindTransacaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("330330330330330")
+                .numeroCartao(Long.valueOf("3303303303303303"))
                 .senha("cccccccccc")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
@@ -220,13 +220,13 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testDeleteTransacaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("440440440440440")
+                .numeroCartao(Long.valueOf("440440440440440"))
                 .senha("ddddddddddd")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao("440440440440440")).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao(Long.valueOf("440440440440440"))).thenReturn(Optional.of(mockCartaoEntity));
 
         TransacaoEntity mockTransacaoEntity = TransacaoEntity.builder()
                 .id(1L)
@@ -247,7 +247,7 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testDeleteTransacaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("550550550550550")
+                .numeroCartao(Long.valueOf("550550550550550"))
                 .senha("eeeeeeeeeeee")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)

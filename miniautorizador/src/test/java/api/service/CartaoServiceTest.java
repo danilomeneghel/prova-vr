@@ -41,7 +41,7 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Cria o cartão com sucesso")
     void testSaveCartao() {
         CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .senha(null)
                 .build();
 
@@ -62,13 +62,13 @@ public class CartaoServiceTest extends ApplicationTests {
         List<CartaoEntity> mockListCartoesEntities = Stream.of(
                         CartaoEntity.builder()
                                 .id(1L)
-                                .numeroCartao("1111111111")
+                                .numeroCartao(Long.valueOf("1111111111111111"))
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build(),
                         CartaoEntity.builder()
                                 .id(2L)
-                                .numeroCartao("2222222222")
+                                .numeroCartao(Long.valueOf("2222222222222222"))
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build())
@@ -90,13 +90,13 @@ public class CartaoServiceTest extends ApplicationTests {
         List<CartaoEntity> mockListCartoesEntities = Stream.of(
                         CartaoEntity.builder()
                                 .id(1L)
-                                .numeroCartao("1111111111")
+                                .numeroCartao(Long.valueOf("1111111111111111"))
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build(),
                         CartaoEntity.builder()
                                 .id(2L)
-                                .numeroCartao("2222222222")
+                                .numeroCartao(Long.valueOf("2222222222222222"))
                                 .saldo(saldo)
                                 .status(CartaoStatus.ATIVO)
                                 .build())
@@ -119,7 +119,7 @@ public class CartaoServiceTest extends ApplicationTests {
     void testFindCartaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -138,7 +138,7 @@ public class CartaoServiceTest extends ApplicationTests {
     void testFindCartaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -156,14 +156,14 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Localiza o cartão por Número do Cartão com sucesso")
     void testFindCartaoByNumber() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao("1111111111")).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao(Long.valueOf("1111111111111111"))).thenReturn(Optional.of(mockCartaoEntity));
 
-        BigDecimal findCartao = cartaoService.findCartaoByNumeroCartao("1111111111");
+        BigDecimal findCartao = cartaoService.findCartaoByNumeroCartao(Long.valueOf("1111111111111111"));
 
         Assertions.assertNotNull(findCartao);
         assertEquals(mockCartaoEntity.getSaldo().getValor(), findCartao);
@@ -173,15 +173,15 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Localiza o cartão por Número do Cartão inválido")
     void testFindCartaoByNumberInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao("1111111111")).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao(Long.valueOf("1111111111111111"))).thenReturn(Optional.of(mockCartaoEntity));
 
         try {
-            cartaoService.findCartaoByNumeroCartao("555555555");
+            cartaoService.findCartaoByNumeroCartao(Long.valueOf("5555555555555555"));
         } catch (Exception e) {
             assertEquals("", e.getMessage());
         }
@@ -191,7 +191,7 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Altera o cartão por ID com sucesso")
     void testUpdateCartao() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .senha("xxxxxxxx")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
@@ -199,7 +199,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.existsById(1L)).thenReturn(true);
 
-        mockCartaoEntity.setNumeroCartao("3333333333");
+        mockCartaoEntity.setNumeroCartao(Long.valueOf("3333333333333333"));
         when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(mockCartaoEntity);
 
         CartaoModel updateCartaoModel = cartaoService.update(1L, mockCartaoEntity);
@@ -215,7 +215,7 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Altera o cartão por ID inválido")
     void testUpdateCartaoIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .senha("2222222222")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
@@ -223,7 +223,7 @@ public class CartaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.existsById(1L)).thenReturn(true);
 
-        mockCartaoEntity.setNumeroCartao("44444444444");
+        mockCartaoEntity.setNumeroCartao(Long.valueOf("4444444444444444"));
         when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(mockCartaoEntity);
 
         try {
@@ -237,7 +237,7 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Exclui o cartão por ID com sucesso")
     void testDeleteCartaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .senha("2222222222")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
@@ -255,7 +255,7 @@ public class CartaoServiceTest extends ApplicationTests {
     @DisplayName("Exclui o cartão por ID inválido")
     void testDeleteCartaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao("1111111111")
+                .numeroCartao(Long.valueOf("1111111111111111"))
                 .senha("2222222222")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)

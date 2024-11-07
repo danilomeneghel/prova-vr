@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CriaCartaoModel {
 
-    private String numeroCartao;
+    private Long numeroCartao;
 
     private String senha;
 

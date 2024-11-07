@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface CartaoRepository extends CrudRepository<CartaoEntity, Long > {
 
-    Optional<CartaoEntity> findByNumeroCartao(String numeroCartao );
+    Optional<CartaoEntity> findByNumeroCartao(Long numeroCartao );
 
     List<CartaoEntity> findAllByOrderByNumeroCartaoAsc();
 

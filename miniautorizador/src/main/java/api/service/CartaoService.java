@@ -30,7 +30,7 @@ public class CartaoService {
 
     private ModelMapper mapper = new ModelMapper();
 
-    public BigDecimal findCartaoByNumeroCartao(String numeroCartao ) {
+    public BigDecimal findCartaoByNumeroCartao(Long numeroCartao ) {
         CartaoEntity cartao = cartaoRepository.findByNumeroCartao(numeroCartao).orElse( null );
         while ( cartao == null ) {
             throw new ModelException(CartaoErrors.INVALID_NUMBER_CARD);

@@ -26,12 +26,12 @@ public class CartaoController {
     private CartaoService cartaoService;
 
     @GetMapping( value = "/{numeroCartao}" )
-    public ResponseEntity< BigDecimal > getCardByNumber(@PathVariable String numeroCartao) {
+    public ResponseEntity< BigDecimal > getCardByNumber(@PathVariable Long numeroCartao) {
         return new ResponseEntity< >(cartaoService.findCartaoByNumeroCartao(numeroCartao), HttpStatus.OK);
     }
 
     @GetMapping( value = "/id/{id}" )
-    public ResponseEntity< CartaoModel > getCardByNumber(@PathVariable Long id) {
+    public ResponseEntity< CartaoModel > getCardById(@PathVariable Long id) {
         return new ResponseEntity< >(cartaoService.findCartaoById(id), HttpStatus.OK);
     }
 

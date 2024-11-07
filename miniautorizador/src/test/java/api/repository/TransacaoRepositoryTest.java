@@ -49,12 +49,12 @@ class TransacaoRepositoryTest {
         MockitoAnnotations.openMocks(this);
 
         criaTransacaoModel = new CriaTransacaoModel();
-        criaTransacaoModel.setNumeroCartao("1234567890123456");
+        criaTransacaoModel.setNumeroCartao(Long.valueOf("1234567890123456"));
         criaTransacaoModel.setSenha("1234");
         criaTransacaoModel.setValor(BigDecimal.valueOf(100));
 
         cartaoEntity = new CartaoEntity();
-        cartaoEntity.setNumeroCartao("1234567890123456");
+        cartaoEntity.setNumeroCartao(Long.valueOf("1234567890123456"));
         cartaoEntity.setSenha("1234");
         cartaoEntity.setStatus(CartaoStatus.ATIVO);
 
@@ -156,7 +156,7 @@ class TransacaoRepositoryTest {
     @Test
     @DisplayName("Cria uma transação com número de cartão inválido")
     void testSaveTransacaoComNumeroCartaoInvalido() {
-        criaTransacaoModel.setNumeroCartao("0000000000000000");
+        criaTransacaoModel.setNumeroCartao(Long.valueOf("0000000000000000"));
 
         Mockito.when(cartaoRepository.findByNumeroCartao(criaTransacaoModel.getNumeroCartao()))
                 .thenReturn(Optional.empty());

@@ -32,7 +32,7 @@ public class CartaoRepositoryTest {
         saldoEntity = saldoRepository.save(saldoEntity);
 
         cartaoEntity = new CartaoEntity();
-        cartaoEntity.setNumeroCartao("1234567890123456");
+        cartaoEntity.setNumeroCartao(Long.valueOf("1234567890123456"));
         cartaoEntity.setSaldo(saldoEntity);
         cartaoEntity.setStatus(CartaoStatus.ATIVO);
     }
@@ -54,7 +54,7 @@ public class CartaoRepositoryTest {
     @DisplayName("Salva cartão com saldo nulo, o que deve gerar uma exceção")
     void testSaveCartaoWithNullSaldo() {
         CartaoEntity cartaoComSaldoNulo = new CartaoEntity();
-        cartaoComSaldoNulo.setNumeroCartao("9876543210987654");
+        cartaoComSaldoNulo.setNumeroCartao(Long.valueOf("9876543210987654"));
         cartaoComSaldoNulo.setSaldo(null);
         cartaoComSaldoNulo.setStatus(CartaoStatus.ATIVO);
 
@@ -89,7 +89,7 @@ public class CartaoRepositoryTest {
     @DisplayName("Salva e localiza um cartão com status INATIVO")
     void testCartaoStatusInativo() {
         CartaoEntity cartaoInativo = new CartaoEntity();
-        cartaoInativo.setNumeroCartao("1111222233334444");
+        cartaoInativo.setNumeroCartao(Long.valueOf("1111222233334444"));
         cartaoInativo.setSaldo(saldoEntity);
         cartaoInativo.setStatus(CartaoStatus.INATIVO);
 

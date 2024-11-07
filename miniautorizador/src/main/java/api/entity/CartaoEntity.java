@@ -27,7 +27,7 @@ public class CartaoEntity {
 
     @Column(name = "numeroCartao", nullable = false)
     @NotBlank( message = "Número do cartão é obrigatório" )
-    private String numeroCartao;
+    private Long numeroCartao;
 
     @Column(name = "senha")
     private String senha;
