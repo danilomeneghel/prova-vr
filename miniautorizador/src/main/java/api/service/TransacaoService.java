@@ -37,18 +37,16 @@ public class TransacaoService {
     private ModelMapper mapper = new ModelMapper();
 
     public TransacaoModel findById(Long id) {
-        TransacaoEntity transacao = transacaoRepository.findById(id).orElse(new TransacaoEntity());
-        while (transacao.getId() == null) {
-            throw new ModelException(TransacaoErrors.NOT_FOUND);
-        }
+        TransacaoEntity transacao = transacaoRepository.findById(id)
+                .orElseThrow(() -> new ModelException(TransacaoErrors.NOT_FOUND));
         return mapper.map(transacao, TransacaoModel.class);
     }
 
     public List<TransacaoModel> findAll() {
         List<TransacaoEntity> transacoes = transacaoRepository.findAll();
-        while (transacoes.isEmpty()) {
-            throw new ModelException(TransacaoErrors.NOT_FOUND);
-        }
+        Optional.ofNullable(transacoes)
+                .filter(transacoesList -> !transacoesList.isEmpty())
+                .orElseThrow(() -> new ModelException(TransacaoErrors.NOT_FOUND));
         return transacoes.stream().map(entity -> mapper.map(entity, TransacaoModel.class)).collect(Collectors.toList());
     }
 
@@ -75,30 +73,27 @@ public class TransacaoService {
 
     public SaldoEntity updateBalance(Optional<CartaoEntity> cartao, BigDecimal valorTransacao, String tipo) {
         CartaoEntity cartaoEntity = cartao.orElseThrow(() -> new ModelException(TransacaoErrors.INVALID_NUMBER_CARD));
-
         SaldoEntity saldoEntity = cartaoEntity.getSaldo();
-        if (saldoEntity == null) {
-            throw new ModelException(TransacaoErrors.NOT_FOUND);
-        }
-
+        Optional.ofNullable(saldoEntity).orElseThrow(() -> new ModelException(TransacaoErrors.NOT_FOUND));
         BigDecimal novoValor = tipo.equals("debito")
                 ? saldoEntity.getValor().subtract(valorTransacao)
                 : saldoEntity.getValor().add(valorTransacao);
-
         saldoEntity.setValor(novoValor);
-
         return saldoRepository.save(saldoEntity);
     }
 
     public String deleteById(Long id) {
-        Optional<TransacaoEntity> transacaoEntity = transacaoRepository.findById(id);
-        while (transacaoEntity.isPresent()) {
-            Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.get().getCartao().getNumeroCartao());
-            transacaoRepository.deleteById(id);
-            updateBalance(cartao, transacaoEntity.get().getValor(), "credito");
-            return "Transação excluída com sucesso.";
-        }
-        throw new ModelException(TransacaoErrors.NOT_FOUND);
+        transacaoRepository.findById(id)
+                .ifPresentOrElse(
+                        transacaoEntity -> {
+                            Optional<CartaoEntity> cartao = cartaoRepository.findByNumeroCartao(transacaoEntity.getCartao().getNumeroCartao());
+                            transacaoRepository.deleteById(id);
+                            updateBalance(cartao, transacaoEntity.getValor(), "credito");
+                        }, () -> {
+                            throw new ModelException(TransacaoErrors.NOT_FOUND);
+                        }
+                );
+        return "Transação excluída com sucesso.";
     }
 
 }

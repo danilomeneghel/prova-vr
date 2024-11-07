@@ -10,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
@@ -26,7 +28,8 @@ public class CartaoEntity {
     private Long id;
 
     @Column(name = "numeroCartao", nullable = false)
-    @NotBlank( message = "Número do cartão é obrigatório" )
+    @NotNull( message = "Número do cartão é obrigatório" )
+    @Size(min = 13, max = 19, message = "O número do cartão deve ter entre 13 e 19 dígitos")
     private Long numeroCartao;
 
     @Column(name = "senha")
