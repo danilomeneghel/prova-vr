@@ -124,6 +124,14 @@ $ cd miniautorizador
 $ mvn test
 ```
 
+## Screenshots
+
+Swagger-UI <br>
+![Screenshots](screenshots/screenshot01.png) <br><br>
+
+Modelagem ER <br>
+![Screenshots](screenshots/screenshot02.png) <br><br>
+
 ## Licença
 
 Projeto licenciado sob <a href="LICENSE">The MIT License (MIT)</a>.<br><br>
