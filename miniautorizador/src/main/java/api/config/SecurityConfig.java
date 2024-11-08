@@ -18,8 +18,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Autenticação básica
-        http.csrf().disable()
-                .authorizeRequests()
+        http.authorizeRequests()
                 .antMatchers("/swagger-ui/**", "/v3/api-docs/**").authenticated() // Protege o Swagger
                 .anyRequest().permitAll() // Permite o acesso para outras URLs
                 .and()

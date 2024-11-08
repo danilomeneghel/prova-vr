@@ -1,9 +1,7 @@
 package api.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,7 +10,8 @@ import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +21,7 @@ public class TransacaoModel {
 
     private CartaoModel cartao;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal valor;
 
     @CreationTimestamp

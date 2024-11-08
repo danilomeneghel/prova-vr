@@ -17,4 +17,5 @@ public interface CartaoRepository extends CrudRepository<CartaoEntity, Long > {
 
     List<CartaoEntity> findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus status );
 
+    CartaoEntity findTopByOrderByIdDesc();
 }

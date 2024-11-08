@@ -36,29 +36,18 @@ public abstract class BaseModelExceptionHandler {
         return new ResponseEntity<>(errorModel, HttpStatus.resolve(errorModel.getStatus()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
-        StringBuffer sb = new StringBuffer();
-        Iterator<ObjectError> errorsIterator = ex.getBindingResult().getAllErrors().iterator();
-        while(errorsIterator.hasNext()) {
-            ObjectError error = errorsIterator.next();
-            String field = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            sb.append(String.format("%s: %s", field, message));
-            if (errorsIterator.hasNext()) {
-                sb.append(", ");
-            }
-        }
+    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    protected ResponseEntity<Object> handleValidationExceptions(Exception ex, WebRequest request) {
+        String details = extractValidationErrors(ex);
         ErrorModel errorModel = CommonErrors.INVALID_PARAMETERS;
-        errorModel.setDetails(sb.toString());
+        errorModel.setDetails(details);
         return new ResponseEntity<>(errorModel, HttpStatus.resolve(errorModel.getStatus()));
     }
 
-    @ExceptionHandler(BindException.class)
-    protected ResponseEntity<Object> handleBindException(BindException ex, WebRequest request) {
-        StringBuffer sb = new StringBuffer();
-        Iterator<ObjectError> errorsIterator = ex.getBindingResult().getAllErrors().iterator();
-        while(errorsIterator.hasNext()) {
+    private String extractValidationErrors(Exception ex) {
+        StringBuilder sb = new StringBuilder();
+        Iterator<ObjectError> errorsIterator = getBindingResult(ex).getAllErrors().iterator();
+        while (errorsIterator.hasNext()) {
             ObjectError error = errorsIterator.next();
             String field = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
@@ -67,9 +56,17 @@ public abstract class BaseModelExceptionHandler {
                 sb.append(", ");
             }
         }
-        ErrorModel errorModel = CommonErrors.INVALID_PARAMETERS;
-        errorModel.setDetails(sb.toString());
-        return new ResponseEntity<>(errorModel, HttpStatus.resolve(errorModel.getStatus()));
+        return sb.toString();
+    }
+
+    private org.springframework.validation.BindingResult getBindingResult(Exception ex) {
+        if (ex instanceof MethodArgumentNotValidException) {
+            return ((MethodArgumentNotValidException) ex).getBindingResult();
+        } else if (ex instanceof BindException) {
+            return ((BindException) ex).getBindingResult();
+        } else {
+            throw new IllegalArgumentException("Unsupported exception type");
+        }
     }
 
     @ExceptionHandler
@@ -77,5 +74,4 @@ public abstract class BaseModelExceptionHandler {
         ErrorModel errorModel = CommonErrors.UNEXPECTED_ERROR;
         return new ResponseEntity<>(errorModel, HttpStatus.resolve(errorModel.getStatus()));
     }
-
 }

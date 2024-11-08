@@ -1,6 +1,8 @@
 package api.controller;
 
 import api.ApplicationTests;
+import api.entity.TransacaoEntity;
+import api.repository.TransacaoRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,16 +22,14 @@ public class TransacaoControllerTest extends ApplicationTests {
     private TransacaoController transacaoController;
 
     @Autowired
+    private TransacaoRepository transacaoRepository;
+
+    @Autowired
     private CartaoController cartaoController;
 
     @BeforeEach
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
-    }
-
-    @AfterAll
-    public void tearDown() throws Exception {
-        this.testDELETETransaction();
     }
 
     @Test
@@ -57,6 +57,8 @@ public class TransacaoControllerTest extends ApplicationTests {
     @Test
     @DisplayName("Pega todas as Transações")
     public void testGETTransactions() throws Exception {
+        transacaoRepository.deleteAll();
+
         String cartao = "{\"numeroCartao\": \"2222222222222222\", \"senha\": \"333333333333\", \"status\": \"ATIVO\"}";
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).build();
@@ -76,7 +78,8 @@ public class TransacaoControllerTest extends ApplicationTests {
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
         this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].valor").value(10.2));
     }
 
     @Test
@@ -100,10 +103,13 @@ public class TransacaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/{id}", "1"))
+        TransacaoEntity lastTransaction = transacaoRepository.findTopByOrderByIdDesc();
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/{id}", lastTransaction.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    @Test
     @DisplayName("Exclui o Transação por ID")
     public void testDELETETransaction() throws Exception {
         String cartao = "{\"numeroCartao\": \"5555555555555555\", \"senha\": \"66666666666\", \"status\": \"ATIVO\"}";
@@ -124,8 +130,14 @@ public class TransacaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_API+"/{id}", "1"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        TransacaoEntity lastTransaction = transacaoRepository.findTopByOrderByIdDesc();
+
+        if (lastTransaction != null) {
+            this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_API + "/{id}", lastTransaction.getId()))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
+        } else {
+            throw new RuntimeException("Nenhuma transação encontrada.");
+        }
     }
 
 }

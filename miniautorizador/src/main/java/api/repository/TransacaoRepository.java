@@ -11,4 +11,6 @@ public interface TransacaoRepository extends CrudRepository<TransacaoEntity, Lon
 
     List<TransacaoEntity> findAll();
 
+    TransacaoEntity findTopByOrderByIdDesc();
+
 }

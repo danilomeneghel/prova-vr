@@ -1,10 +1,7 @@
 package api.model;
 
 import api.enums.CartaoStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,7 +9,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

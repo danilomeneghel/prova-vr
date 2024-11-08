@@ -54,42 +54,8 @@ public class CartaoServiceTest extends ApplicationTests {
     }
 
     @Test
-    @DisplayName("Lança erro ao tentar criar um cartão com número de cartão já existente")
-    void testSaveCartaoCardExists() {
-        CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
-                .numeroCartao(Long.valueOf("1111111111111111"))
-                .senha("senha123")
-                .build();
-
-        CartaoEntity cartaoEntity = mapper.map(mockCartaoModel, CartaoEntity.class);
-
-        when(cartaoRepository.findByNumeroCartao(mockCartaoModel.getNumeroCartao())).thenReturn(Optional.of(cartaoEntity));
-
-        ModelException exception = assertThrows(ModelException.class, () -> {
-            cartaoService.save(mockCartaoModel);
-        });
-
-        assertEquals(CartaoErrors.CARD_EXISTS.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Lança erro ao criar cartão com número inválido")
-    void testSaveCartaoInvalidNumber() {
-        CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
-                .numeroCartao(Long.valueOf("1234"))
-                .senha("senha123")
-                .build();
-
-        ModelException exception = assertThrows(ModelException.class, () -> {
-            cartaoService.save(mockCartaoModel);
-        });
-
-        assertEquals(CartaoErrors.INVALID_NUMBER_CARD.getMessage(), exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Falha ao criar o cartão por erro ao salvar saldo")
-    void testSaveCartaoErrorCreating() {
+    void testSaveCartaoError() {
         CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
                 .numeroCartao(Long.valueOf("1111111111111111"))
                 .senha("senha123")
@@ -100,11 +66,42 @@ public class CartaoServiceTest extends ApplicationTests {
         when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(cartaoEntity);
         when(saldoRepository.save(any(SaldoEntity.class))).thenThrow(new RuntimeException("Erro ao salvar saldo"));
 
-        ModelException exception = assertThrows(ModelException.class, () -> {
+        try {
             cartaoService.save(mockCartaoModel);
-        });
+            fail("Esperado ModelException, mas não ocorreu");
+        } catch (ModelException exception) {
+            assertEquals(CartaoErrors.ERROR_CREATING.getMessage(), exception.getMessage());
+        }
+    }
 
-        assertEquals(CartaoErrors.ERROR_CREATING.getMessage(), exception.getMessage());
+    @Test
+    @DisplayName("Lança exceção quando o cartão já existir")
+    void testSaveCartaoCardExists() {
+        CartaoEntity cartaoEntity = CartaoEntity.builder()
+                .numeroCartao(Long.valueOf("3333333333333333"))
+                .senha("senha123")
+                .status(CartaoStatus.INATIVO)
+                .build();
+
+        when(cartaoRepository.findByNumeroCartao(anyLong())).thenReturn(Optional.of(cartaoEntity));
+
+        CriaCartaoModel criaCartaoModel = new CriaCartaoModel();
+        criaCartaoModel.setNumeroCartao(123456789012L);
+        criaCartaoModel.setSenha("senha123");
+
+        ModelException exception = assertThrows(ModelException.class, () -> cartaoService.save(criaCartaoModel));
+        assert exception.getMessage().equals(CartaoErrors.CARD_EXISTS.getMessage());
+    }
+
+    @Test
+    @DisplayName("Lança exceção quando o número do cartão for inválido (menor que 13 dígitos)")
+    void testSaveCartaoInvalidNumber() {
+        CriaCartaoModel criaCartaoModel = new CriaCartaoModel();
+        criaCartaoModel.setNumeroCartao(1234567890L);
+        criaCartaoModel.setSenha("1234");
+
+        ModelException exception = assertThrows(ModelException.class, () -> cartaoService.save(criaCartaoModel));
+        assert exception.getMessage().equals(CartaoErrors.INVALID_NUMBER_CARD.getMessage());
     }
 
     @Test
@@ -138,6 +135,42 @@ public class CartaoServiceTest extends ApplicationTests {
     }
 
     @Test
+    @DisplayName("Lança exceção quando tentar atualizar um cartão inexistente")
+    void testUpdateCartaoNotFound() {
+        when(cartaoRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        CartaoEntity updatedCartaoEntity = new CartaoEntity();
+        updatedCartaoEntity.setId(999L);
+        updatedCartaoEntity.setNumeroCartao(123456789012L);
+        updatedCartaoEntity.setSenha("4321");
+
+        ModelException exception = assertThrows(ModelException.class, () -> cartaoService.update(999L, updatedCartaoEntity));
+        assert exception.getMessage().equals(CartaoErrors.NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("Lança exceção quando o número do cartão for inválido durante a atualização")
+    void testUpdateCartaoInvalidNumber() {
+        CartaoEntity cartaoEntity = CartaoEntity.builder()
+                .numeroCartao(Long.valueOf("3333333333333333"))
+                .senha("senha456")
+                .status(CartaoStatus.INATIVO)
+                .build();
+
+        CartaoEntity updatedCartaoEntity = new CartaoEntity();
+        updatedCartaoEntity.setId(cartaoEntity.getId());
+        updatedCartaoEntity.setNumeroCartao(123L);
+        updatedCartaoEntity.setSenha("senha456");
+
+        when(cartaoRepository.findById(cartaoEntity.getId())).thenReturn(Optional.of(cartaoEntity));
+
+        ModelException exception = assertThrows(ModelException.class, () -> cartaoService.update(cartaoEntity.getId(), updatedCartaoEntity));
+
+        assertEquals(CartaoErrors.INVALID_NUMBER_CARD.getMessage(), exception.getMessage());
+        verify(cartaoRepository, times(0)).save(any(CartaoEntity.class));
+    }
+
+    @Test
     @DisplayName("Lança erro ao tentar atualizar cartão com ID inválido")
     void testUpdateCartaoIdInvalid() {
         CartaoEntity cartaoEntity = CartaoEntity.builder()
@@ -156,21 +189,4 @@ public class CartaoServiceTest extends ApplicationTests {
         assertEquals(CartaoErrors.NOT_FOUND.getMessage(), exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Lança erro ao tentar atualizar um cartão inexistente")
-    void testUpdateCartaoNotFound() {
-        CartaoEntity cartaoEntity = CartaoEntity.builder()
-                .numeroCartao(Long.valueOf("3333333333333333"))
-                .senha("senha456")
-                .status(CartaoStatus.INATIVO)
-                .build();
-
-        when(cartaoRepository.existsById(1L)).thenReturn(false);
-
-        ModelException exception = assertThrows(ModelException.class, () -> {
-            cartaoService.update(1L, cartaoEntity);
-        });
-
-        assertEquals(CartaoErrors.NOT_FOUND.getMessage(), exception.getMessage());
-    }
 }

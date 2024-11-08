@@ -15,7 +15,7 @@ services:
   mysql:
     image: mysql:8
     hostname: mysql
-    container_name: mysql
+    container_name: vr-mysql
     restart: always
     ports:
       - "3306:3306"
@@ -27,12 +27,12 @@ services:
     volumes:
       - ./:/mysql
   sonarqube:
-    container_name: sonarqube
+    container_name: vr-sonarqube
     image: sonarqube:9.9.7-community
     ports:
       - "9000:9000"
   api:
-    container_name: api
+    container_name: vr-api
     build: ../miniautorizador/
     command: mvn clean spring-boot:run -Dspring-boot.run.profiles=docker
     ports:

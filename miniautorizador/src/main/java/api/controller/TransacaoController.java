@@ -3,6 +3,8 @@ package api.controller;
 import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.service.TransacaoService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping( "/transacoes" )
+@OpenAPIDefinition(info = @Info(title = "Mini Autorizador", description = "API REST - VR Benefícios"))
 @Tag( name = "Transações", description = "Cadastro de Transações" )
 @Validated
 public class TransacaoController {

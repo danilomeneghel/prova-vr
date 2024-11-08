@@ -99,25 +99,32 @@ public class TransacaoServiceTest extends ApplicationTests {
         when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
 
         List<TransacaoEntity> mockTransacaoEntities = Stream.of(
-                    TransacaoEntity.builder()
-                        .id(1L)
-                        .cartao(mockCartaoEntity)
-                        .valor(BigDecimal.valueOf(10.50))
-                        .build(),
-                    TransacaoEntity.builder()
-                        .id(2L)
-                        .cartao(mockCartaoEntity)
-                        .valor(BigDecimal.valueOf(11.55))
-                        .build())
+                        TransacaoEntity.builder()
+                                .id(1L)
+                                .cartao(mockCartaoEntity)
+                                .valor(BigDecimal.valueOf(10.50))
+                                .build(),
+                        TransacaoEntity.builder()
+                                .id(2L)
+                                .cartao(mockCartaoEntity)
+                                .valor(BigDecimal.valueOf(11.55))
+                                .build())
                 .collect(Collectors.toList());
 
         when(transacaoRepository.findAll()).thenReturn(mockTransacaoEntities);
 
-        List< TransacaoModel > transacoes = transacaoService.findAll();
-        List< TransacaoEntity > listaTransacoes = transacoes.stream().map(entity -> mapper.map(entity, TransacaoEntity.class)).collect(Collectors.toList());
+        List<TransacaoModel> transacoes = transacaoService.findAll();
+        List<TransacaoEntity> listaTransacoes = transacoes.stream()
+                .map(entity -> mapper.map(entity, TransacaoEntity.class))
+                .collect(Collectors.toList());
 
         Assertions.assertNotNull(listaTransacoes);
-        assertEquals(mockTransacaoEntities, listaTransacoes);
+        assertEquals(mockTransacaoEntities.size(), listaTransacoes.size());
+        for (int i = 0; i < mockTransacaoEntities.size(); i++) {
+            assertEquals(mockTransacaoEntities.get(i).getId(), listaTransacoes.get(i).getId());
+            assertEquals(mockTransacaoEntities.get(i).getCartao().getId(), listaTransacoes.get(i).getCartao().getId());
+            assertEquals(mockTransacaoEntities.get(i).getValor(), listaTransacoes.get(i).getValor());
+        }
     }
 
     @Test
@@ -133,27 +140,11 @@ public class TransacaoServiceTest extends ApplicationTests {
 
         when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
 
-        List<TransacaoEntity> mockTransacaoEntities = Stream.of(
-                        TransacaoEntity.builder()
-                                .id(1L)
-                                .cartao(mockCartaoEntity)
-                                .valor(BigDecimal.valueOf(10.50))
-                                .build(),
-                        TransacaoEntity.builder()
-                                .id(2L)
-                                .cartao(mockCartaoEntity)
-                                .valor(BigDecimal.valueOf(11.55))
-                                .build())
-                .collect(Collectors.toList());
-
         when(transacaoRepository.findAll()).thenReturn(new ArrayList<>());
 
         try {
-            List< TransacaoModel > transacoes = transacaoService.findAll();
-            List< TransacaoEntity > listaTransacoes = transacoes.stream().map(entity -> mapper.map(entity, TransacaoEntity.class)).collect(Collectors.toList());
-
-            Assertions.assertNotNull(listaTransacoes);
-            assertEquals(mockTransacaoEntities, listaTransacoes);
+            List<TransacaoModel> transacoes = transacaoService.findAll();
+            Assertions.assertTrue(transacoes.isEmpty());
         } catch (Exception e) {
             assertEquals("Nenhuma transação encontrada.", e.getMessage());
         }
@@ -184,11 +175,13 @@ public class TransacaoServiceTest extends ApplicationTests {
         transacaoEntity.setCartao(mockCartaoEntity);
 
         Assertions.assertNotNull(transacaoEntity);
-        assertEquals(mockTransacaoEntity, transacaoEntity);
+        assertEquals(mockTransacaoEntity.getId(), transacaoEntity.getId());
+        assertEquals(mockTransacaoEntity.getValor(), transacaoEntity.getValor());
+        assertEquals(mockTransacaoEntity.getCartao().getId(), transacaoEntity.getCartao().getId());
     }
 
     @Test
-    @DisplayName("Localiza o transação por ID inválido")
+    @DisplayName("Localiza a transação por ID inválido")
     void testFindTransacaoByIdInvalid() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)

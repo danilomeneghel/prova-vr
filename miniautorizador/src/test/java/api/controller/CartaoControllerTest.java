@@ -1,6 +1,8 @@
 package api.controller;
 
 import api.ApplicationTests;
+import api.entity.CartaoEntity;
+import api.repository.CartaoRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,14 +21,12 @@ public class CartaoControllerTest extends ApplicationTests {
     @Autowired
     private CartaoController cartaoController;
 
+    @Autowired
+    private CartaoRepository cartaoRepository;
+
     @BeforeEach
     public void setUp() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).build();
-    }
-
-    @AfterAll
-    public void tearDown() throws Exception {
-        this.testDELETECard();
     }
 
     @Test
@@ -53,7 +53,8 @@ public class CartaoControllerTest extends ApplicationTests {
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
         this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
     }
 
     @Test
@@ -82,7 +83,9 @@ public class CartaoControllerTest extends ApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/id/{id}", "1"))
+        CartaoEntity lastCard = cartaoRepository.findTopByOrderByIdDesc();
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/id/{id}", lastCard.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
@@ -99,40 +102,58 @@ public class CartaoControllerTest extends ApplicationTests {
 
         String updated = "{\"numeroCartao\": \"7777777777777777\", \"senha\": \"88888888888\", \"status\": \"ATIVO\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put(URL_API+"/{id}", "1")
+        CartaoEntity lastCard = cartaoRepository.findTopByOrderByIdDesc();
+
+        this.mockMvc.perform(MockMvcRequestBuilders.put(URL_API+"/{id}", lastCard.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updated)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-    @DisplayName("Exclui o Cartão por ID")
-    public void testDELETECard() throws Exception {
-        String data = "{\"numeroCartao\": \"6060606060606060\", \"senha\": \"9999999999999\", \"status\": \"ATIVO\"}";
-
-        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(data)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
-
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_API+"/{id}", "1"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
     @Test
     @DisplayName("Pega os Cartões por Status")
     public void testGETCardsByStatus() throws Exception {
-        String data = "{\"numeroCartao\": \"8080808080808080\", \"senha\": \"1111111111\", \"status\": \"ATIVO\"}";
+        String data1 = "{\"numeroCartao\": \"6060606060606060\", \"senha\": \"1111111111\", \"status\": \"ATIVO\"}";
 
         this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(data)
+                        .content(data1)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        String data2 = "{\"numeroCartao\": \"7070707070707070\", \"senha\": \"2222222222\", \"status\": \"ATIVO\"}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data2)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
         this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API + "/status/{status}", "ATIVO"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
+    }
+
+    @Test
+    @DisplayName("Exclui o Cartão por ID")
+    public void testDELETECard() throws Exception {
+        String data = "{\"numeroCartao\": \"8080808080808080\", \"senha\": \"9999999999999\", \"status\": \"ATIVO\"}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        CartaoEntity lastCard = cartaoRepository.findTopByOrderByIdDesc();
+
+        if (lastCard != null) {
+            this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_API + "/{id}", lastCard.getId()))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
+        } else {
+            throw new RuntimeException("Nenhum cartão encontrado.");
+        }
     }
 
 }

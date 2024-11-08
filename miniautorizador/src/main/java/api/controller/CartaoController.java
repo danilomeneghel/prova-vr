@@ -5,6 +5,8 @@ import api.enums.CartaoStatus;
 import api.model.CartaoModel;
 import api.model.CriaCartaoModel;
 import api.service.CartaoService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping( "/cartoes" )
+@OpenAPIDefinition(info = @Info(title = "Mini Autorizador", description = "API REST - VR Benefícios"))
 @Tag( name = "Cartões", description = "Cadastro de Cartões" )
 @Validated
 public class CartaoController {

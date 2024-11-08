@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Schema
-@Data
+@Getter
+@Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor
 public class ErrorModel {
 
     @NonNull
