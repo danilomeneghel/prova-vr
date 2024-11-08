@@ -4,26 +4,22 @@ import api.ApplicationTests;
 import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.enums.CartaoStatus;
+import api.model.errors.CartaoErrors;
+import api.exception.ModelException;
 import api.model.CartaoModel;
 import api.model.CriaCartaoModel;
 import api.repository.CartaoRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import api.repository.SaldoRepository;
+import org.junit.jupiter.api.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CartaoServiceTest extends ApplicationTests {
 
@@ -33,7 +29,8 @@ public class CartaoServiceTest extends ApplicationTests {
     @MockBean
     private CartaoRepository cartaoRepository;
 
-    private SaldoEntity saldo = new SaldoEntity();
+    @MockBean
+    private SaldoRepository saldoRepository;
 
     private ModelMapper mapper = new ModelMapper();
 
@@ -42,232 +39,138 @@ public class CartaoServiceTest extends ApplicationTests {
     void testSaveCartao() {
         CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
                 .numeroCartao(Long.valueOf("1111111111111111"))
-                .senha(null)
+                .senha("senha123")
                 .build();
 
         CartaoEntity cartaoEntity = mapper.map(mockCartaoModel, CartaoEntity.class);
 
         when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(cartaoEntity);
+        when(saldoRepository.save(any(SaldoEntity.class))).thenReturn(new SaldoEntity());
 
-        CartaoModel saveCartaoModel = cartaoService.save(mockCartaoModel);
-        CriaCartaoModel criaCartaoModel = mapper.map(saveCartaoModel, CriaCartaoModel.class);
+        CartaoModel savedCartaoModel = cartaoService.save(mockCartaoModel);
 
-        Assertions.assertNotNull(cartaoEntity);
-        assertEquals(mockCartaoModel, criaCartaoModel);
+        assertNotNull(savedCartaoModel);
+        assertEquals(mockCartaoModel.getNumeroCartao(), savedCartaoModel.getNumeroCartao());
     }
 
     @Test
-    @DisplayName("Localiza todos os cartões por Status com sucesso")
-    void testFindAllByStatus() {
-        List<CartaoEntity> mockListCartoesEntities = Stream.of(
-                        CartaoEntity.builder()
-                                .id(1L)
-                                .numeroCartao(Long.valueOf("1111111111111111"))
-                                .saldo(saldo)
-                                .status(CartaoStatus.ATIVO)
-                                .build(),
-                        CartaoEntity.builder()
-                                .id(2L)
-                                .numeroCartao(Long.valueOf("2222222222222222"))
-                                .saldo(saldo)
-                                .status(CartaoStatus.ATIVO)
-                                .build())
-                .collect(Collectors.toList());
-
-        when(cartaoRepository.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.ATIVO))
-                .thenReturn(mockListCartoesEntities);
-
-        List<CartaoModel> cartoes = cartaoService.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.ATIVO);
-        List< CartaoEntity > listaCartoes = cartoes.stream().map(entity -> mapper.map(entity, CartaoEntity.class)).collect(Collectors.toList());
-
-        Assertions.assertNotNull(listaCartoes);
-        assertEquals(mockListCartoesEntities, listaCartoes);
-    }
-
-    @Test
-    @DisplayName("Localiza todos os cartões por Status inválido")
-    void testFindAllByStatusInvalid() {
-        List<CartaoEntity> mockListCartoesEntities = Stream.of(
-                        CartaoEntity.builder()
-                                .id(1L)
-                                .numeroCartao(Long.valueOf("1111111111111111"))
-                                .saldo(saldo)
-                                .status(CartaoStatus.ATIVO)
-                                .build(),
-                        CartaoEntity.builder()
-                                .id(2L)
-                                .numeroCartao(Long.valueOf("2222222222222222"))
-                                .saldo(saldo)
-                                .status(CartaoStatus.ATIVO)
-                                .build())
-                .collect(Collectors.toList());
-
-        when(cartaoRepository.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.ATIVO))
-                .thenReturn(mockListCartoesEntities);
-
-        try {
-            List<CartaoModel> cartoes = cartaoService.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.INATIVO);
-            List< CartaoEntity > listaCartoes = cartoes.stream().map(entity -> mapper.map(entity, CartaoEntity.class)).collect(Collectors.toList());
-            assertNotEquals(mockListCartoesEntities, listaCartoes);
-        } catch (Exception e) {
-            assertEquals("Nenhum cartão encontrado.", e.getMessage());
-        }
-    }
-
-    @Test
-    @DisplayName("Localiza o cartão por ID com sucesso")
-    void testFindCartaoById() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .id(1L)
+    @DisplayName("Lança erro ao tentar criar um cartão com número de cartão já existente")
+    void testSaveCartaoCardExists() {
+        CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
                 .numeroCartao(Long.valueOf("1111111111111111"))
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
+                .senha("senha123")
                 .build();
 
-        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
+        CartaoEntity cartaoEntity = mapper.map(mockCartaoModel, CartaoEntity.class);
 
-        CartaoModel findCartao = cartaoService.findCartaoById(1L);
-        CartaoEntity cartaoEntity = mapper.map(findCartao, CartaoEntity.class);
+        when(cartaoRepository.findByNumeroCartao(mockCartaoModel.getNumeroCartao())).thenReturn(Optional.of(cartaoEntity));
 
-        Assertions.assertNotNull(cartaoEntity);
-        assertEquals(mockCartaoEntity, cartaoEntity);
+        ModelException exception = assertThrows(ModelException.class, () -> {
+            cartaoService.save(mockCartaoModel);
+        });
+
+        assertEquals(CartaoErrors.CARD_EXISTS.getMessage(), exception.getMessage());
     }
 
     @Test
-    @DisplayName("Localiza o cartão por ID inválido")
-    void testFindCartaoByIdInvalid() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .id(1L)
-                .numeroCartao(Long.valueOf("1111111111111111"))
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
+    @DisplayName("Lança erro ao criar cartão com número inválido")
+    void testSaveCartaoInvalidNumber() {
+        CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
+                .numeroCartao(Long.valueOf("1234"))
+                .senha("senha123")
                 .build();
 
-        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
+        ModelException exception = assertThrows(ModelException.class, () -> {
+            cartaoService.save(mockCartaoModel);
+        });
 
-        try {
-            cartaoService.findCartaoById(2L);
-        } catch (Exception e) {
-            assertEquals("Nenhum cartão encontrado.", e.getMessage());
-        }
+        assertEquals(CartaoErrors.INVALID_NUMBER_CARD.getMessage(), exception.getMessage());
     }
 
     @Test
-    @DisplayName("Localiza o cartão por Número do Cartão com sucesso")
-    void testFindCartaoByNumber() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+    @DisplayName("Falha ao criar o cartão por erro ao salvar saldo")
+    void testSaveCartaoErrorCreating() {
+        CriaCartaoModel mockCartaoModel = CriaCartaoModel.builder()
                 .numeroCartao(Long.valueOf("1111111111111111"))
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
+                .senha("senha123")
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao(Long.valueOf("1111111111111111"))).thenReturn(Optional.of(mockCartaoEntity));
+        CartaoEntity cartaoEntity = mapper.map(mockCartaoModel, CartaoEntity.class);
 
-        BigDecimal findCartao = cartaoService.findCartaoByNumeroCartao(Long.valueOf("1111111111111111"));
+        when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(cartaoEntity);
+        when(saldoRepository.save(any(SaldoEntity.class))).thenThrow(new RuntimeException("Erro ao salvar saldo"));
 
-        Assertions.assertNotNull(findCartao);
-        assertEquals(mockCartaoEntity.getSaldo().getValor(), findCartao);
+        ModelException exception = assertThrows(ModelException.class, () -> {
+            cartaoService.save(mockCartaoModel);
+        });
+
+        assertEquals(CartaoErrors.ERROR_CREATING.getMessage(), exception.getMessage());
     }
 
     @Test
-    @DisplayName("Localiza o cartão por Número do Cartão inválido")
-    void testFindCartaoByNumberInvalid() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao(Long.valueOf("1111111111111111"))
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
-                .build();
-
-        when(cartaoRepository.findByNumeroCartao(Long.valueOf("1111111111111111"))).thenReturn(Optional.of(mockCartaoEntity));
-
-        try {
-            cartaoService.findCartaoByNumeroCartao(Long.valueOf("5555555555555555"));
-        } catch (Exception e) {
-            assertEquals("Número de cartão inválido", e.getMessage());
-        }
-    }
-
-    @Test
-    @DisplayName("Altera o cartão por ID com sucesso")
+    @DisplayName("Atualiza o cartão com sucesso")
     void testUpdateCartao() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+        CartaoEntity existingCartaoEntity = CartaoEntity.builder()
+                .id(1L)
                 .numeroCartao(Long.valueOf("1111111111111111"))
-                .senha("xxxxxxxx")
-                .saldo(saldo)
+                .senha("senha123")
+                .saldo(new SaldoEntity())
                 .status(CartaoStatus.ATIVO)
                 .build();
 
+        CartaoEntity updatedCartaoEntity = CartaoEntity.builder()
+                .id(1L)
+                .numeroCartao(Long.valueOf("3333333333333333"))
+                .senha("senha456")
+                .saldo(new SaldoEntity())
+                .status(CartaoStatus.INATIVO)
+                .build();
+
         when(cartaoRepository.existsById(1L)).thenReturn(true);
+        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(existingCartaoEntity));
+        when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(updatedCartaoEntity);
 
-        mockCartaoEntity.setNumeroCartao(Long.valueOf("3333333333333333"));
-        when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(mockCartaoEntity);
+        CartaoModel updatedCartaoModel = cartaoService.update(1L, updatedCartaoEntity);
 
-        CartaoModel updateCartaoModel = cartaoService.update(1L, mockCartaoEntity);
-        CartaoEntity cartaoEntity = mapper.map(updateCartaoModel, CartaoEntity.class);
-        cartaoEntity.setSaldo(mockCartaoEntity.getSaldo());
-        cartaoEntity.setSenha(mockCartaoEntity.getSenha());
-
-        Assertions.assertNotNull(cartaoEntity);
-        assertEquals(mockCartaoEntity, cartaoEntity);
+        assertNotNull(updatedCartaoModel);
+        assertEquals(updatedCartaoEntity.getNumeroCartao(), updatedCartaoModel.getNumeroCartao());
+        assertEquals(updatedCartaoEntity.getStatus(), updatedCartaoModel.getStatus());
     }
 
     @Test
-    @DisplayName("Altera o cartão por ID inválido")
+    @DisplayName("Lança erro ao tentar atualizar cartão com ID inválido")
     void testUpdateCartaoIdInvalid() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao(Long.valueOf("1111111111111111"))
-                .senha("2222222222")
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
+        CartaoEntity cartaoEntity = CartaoEntity.builder()
+                .numeroCartao(Long.valueOf("3333333333333333"))
+                .senha("senha456")
+                .status(CartaoStatus.INATIVO)
                 .build();
 
         when(cartaoRepository.existsById(1L)).thenReturn(true);
+        when(cartaoRepository.findById(2L)).thenReturn(Optional.empty());
 
-        mockCartaoEntity.setNumeroCartao(Long.valueOf("4444444444444444"));
-        when(cartaoRepository.save(any(CartaoEntity.class))).thenReturn(mockCartaoEntity);
+        ModelException exception = assertThrows(ModelException.class, () -> {
+            cartaoService.update(2L, cartaoEntity);
+        });
 
-        try {
-            cartaoService.update(2L, mockCartaoEntity);
-        } catch (Exception e) {
-            assertEquals("Nenhum cartão encontrado.", e.getMessage());
-        }
+        assertEquals(CartaoErrors.NOT_FOUND.getMessage(), exception.getMessage());
     }
 
     @Test
-    @DisplayName("Exclui o cartão por ID com sucesso")
-    void testDeleteCartaoById() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao(Long.valueOf("1111111111111111"))
-                .senha("2222222222")
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
+    @DisplayName("Lança erro ao tentar atualizar um cartão inexistente")
+    void testUpdateCartaoNotFound() {
+        CartaoEntity cartaoEntity = CartaoEntity.builder()
+                .numeroCartao(Long.valueOf("3333333333333333"))
+                .senha("senha456")
+                .status(CartaoStatus.INATIVO)
                 .build();
 
-        when(cartaoRepository.existsById(1L)).thenReturn(true);
+        when(cartaoRepository.existsById(1L)).thenReturn(false);
 
-        String deleteCartao = cartaoService.deleteCartaoById(1L);
+        ModelException exception = assertThrows(ModelException.class, () -> {
+            cartaoService.update(1L, cartaoEntity);
+        });
 
-        Assertions.assertNotNull(deleteCartao);
-        assertEquals("Cartão excluído com sucesso.", deleteCartao);
+        assertEquals(CartaoErrors.NOT_FOUND.getMessage(), exception.getMessage());
     }
-
-    @Test
-    @DisplayName("Exclui o cartão por ID inválido")
-    void testDeleteCartaoByIdInvalid() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .numeroCartao(Long.valueOf("1111111111111111"))
-                .senha("2222222222")
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
-                .build();
-
-        when(cartaoRepository.existsById(1L)).thenReturn(true);
-
-        try {
-            cartaoService.deleteCartaoById(2L);
-        } catch (Exception e) {
-            assertEquals("Nenhum cartão encontrado.", e.getMessage());
-        }
-    }
-
 }

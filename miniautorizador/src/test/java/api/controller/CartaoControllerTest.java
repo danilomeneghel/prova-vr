@@ -120,4 +120,19 @@ public class CartaoControllerTest extends ApplicationTests {
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
+    @Test
+    @DisplayName("Pega os Cartões por Status")
+    public void testGETCardsByStatus() throws Exception {
+        String data = "{\"numeroCartao\": \"8080808080808080\", \"senha\": \"1111111111\", \"status\": \"ATIVO\"}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API + "/status/{status}", "ATIVO"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
 }
