@@ -109,7 +109,10 @@ $ docker exec -it api bash
 Execute o seguinte comando do sonar:
 
 ```
-$ mvn clean verify sonar:sonar -Dsonar.projectKey=NOME_PROJETO_GERADO -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=TOKEN_GERADO
+$ mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=NOME_PROJETO_GERADO \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=TOKEN_GERADO
 ```
 
 Após executado, acesse o seguinte endereço: <br>
