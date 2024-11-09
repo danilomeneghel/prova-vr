@@ -134,16 +134,21 @@ $ mvn test
 ## Screenshots
 
 Swagger-UI <br>
-![Screenshots](screenshots/screenshot01.png) <br><br>
-
-Modelagem ER <br>
+![Screenshots](screenshots/screenshot01.png) <br>
 ![Screenshots](screenshots/screenshot02.png) <br><br>
 
-Testes Unitários <br>
+Postman <br>
 ![Screenshots](screenshots/screenshot03.png) <br><br>
 
-SonarQube <br>
+Modelagem ER <br>
 ![Screenshots](screenshots/screenshot04.png) <br><br>
+
+Testes Unitários <br>
+![Screenshots](screenshots/screenshot05.png) <br><br>
+
+SonarQube <br>
+![Screenshots](screenshots/screenshot06.png) <br>
+![Screenshots](screenshots/screenshot07.png) <br><br>
 
 
 ## Licença
