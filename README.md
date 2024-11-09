@@ -2,6 +2,7 @@
 
 Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Spring-Boot.
 
+
 ## Características
 
 - CRUD
@@ -12,12 +13,14 @@ Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Sp
 - Exception
 - MockMVC
 
+
 ## Requisitos
 
 - Java JDK 17
 - Apache Maven >= 3.8.6
 - MySql 8
 - Docker (Opcional)
+
 
 ## Tecnologias
 
@@ -31,6 +34,7 @@ Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Sp
 - JUnit
 - SonarQube
 - Docker
+
 
 ## Instalação
 
@@ -54,6 +58,7 @@ $ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 Caso não tenha o Maven instalado ou tenha outra versão, pode usar o comando ./mvnw (no Linux) ou mvnw.cmd (no Windows).
+
 
 ## Docker (Opcional)
 
@@ -82,6 +87,7 @@ http://localhost:8080/cartoes
 Listar transações cadastradas: <br>
 http://localhost:8080/transacoes
 
+
 ## Swagger 
 
 Documentação da API RESTful: <br>
@@ -92,6 +98,7 @@ Login:
   - Usuário: username
   - Senha: password
 
+
 ## SonarQube
 
 Para verificar a cobertura de testes, primeiro acesse o seguinte endereço: <br>
@@ -100,15 +107,10 @@ http://localhost:9000
 Depois efetue o login preenchendo "admin" no usuário e senha (login padrão). <br>
 Ao se logar crie um novo projeto e gere o token.
 
-Feito isso, entre no container criado da api:
-
-```
-$ docker exec -it api bash
-```
-
 Execute o seguinte comando do sonar:
 
 ```
+$ cd miniautorizador
 $ mvn clean verify sonar:sonar \
   -Dsonar.projectKey=NOME_PROJETO_GERADO \
   -Dsonar.host.url=http://localhost:9000 \
@@ -128,6 +130,7 @@ $ cd miniautorizador
 $ mvn test
 ```
 
+
 ## Screenshots
 
 Swagger-UI <br>
@@ -138,6 +141,9 @@ Modelagem ER <br>
 
 Testes Unitários <br>
 ![Screenshots](screenshots/screenshot03.png) <br><br>
+
+SonarQube <br>
+![Screenshots](screenshots/screenshot04.png) <br><br>
 
 
 ## Licença

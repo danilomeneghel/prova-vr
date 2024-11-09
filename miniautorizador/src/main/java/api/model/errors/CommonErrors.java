@@ -10,4 +10,7 @@ public class CommonErrors {
 
     public static final ErrorModel UNEXPECTED_ERROR = new ErrorModel(HttpStatus.INTERNAL_SERVER_ERROR.value(), "500000", "Erro inesperado");
 
+    private CommonErrors() {
+    }
+
 }
