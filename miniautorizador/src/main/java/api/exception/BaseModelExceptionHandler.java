@@ -22,6 +22,18 @@ public abstract class BaseModelExceptionHandler {
         return new ResponseEntity<>(ex.getModel(), HttpStatus.resolve(ex.getModel().getStatus()));
     }
 
+    @ExceptionHandler(CartaoJaExisteException.class)
+    public ResponseEntity<Object> handleCartaoJaExiste(CartaoJaExisteException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getCartaoRespostaModel(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(TransacaoException.class)
+    public ResponseEntity<String> handleTransacaoException(TransacaoException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .contentType(org.springframework.http.MediaType.TEXT_PLAIN)
+                .body(ex.getMessage());
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex, WebRequest request) {
         HttpStatus status = ex.getStatus();

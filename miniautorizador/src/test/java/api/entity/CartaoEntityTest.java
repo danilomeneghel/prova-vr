@@ -12,14 +12,14 @@ class CartaoEntityTest {
     void testCartaoEntity() {
         SaldoEntity saldoEntity = new SaldoEntity();
         CartaoEntity cartaoEntity = CartaoEntity.builder()
-                .numeroCartao(1234567890123456L)
+                .numeroCartao("1234567890123456")
                 .senha("senha123")
                 .saldo(saldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
         assertNotNull(cartaoEntity);
-        assertEquals(Long.valueOf("1234567890123456"), cartaoEntity.getNumeroCartao());
+        assertEquals("1234567890123456", cartaoEntity.getNumeroCartao());
         assertEquals("senha123", cartaoEntity.getSenha());
         assertEquals(CartaoStatus.ATIVO, cartaoEntity.getStatus());
         assertNotNull(cartaoEntity.getSaldo());
@@ -29,7 +29,7 @@ class CartaoEntityTest {
     @DisplayName("Deve criar uma entidade CartaoEntity status INATIVO")
     void testCartaoEntityInativo() {
         CartaoEntity cartaoEntity = CartaoEntity.builder()
-                .numeroCartao(Long.valueOf("1234567890123456"))
+                .numeroCartao("1234567890123456")
                 .status(CartaoStatus.INATIVO)
                 .build();
 

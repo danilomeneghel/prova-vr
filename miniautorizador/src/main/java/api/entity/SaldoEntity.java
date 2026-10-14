@@ -23,7 +23,7 @@ public class SaldoEntity {
     private Long id;
 
     @Column(name = "valor", nullable = false)
-    private BigDecimal valor = BigDecimal.valueOf(500); //Inicia o cartão com R$500,00
+    private BigDecimal valor = BigDecimal.valueOf(500);
 
     @CreationTimestamp
     @Temporal( TemporalType.TIMESTAMP )

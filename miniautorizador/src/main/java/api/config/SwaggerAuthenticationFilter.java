@@ -22,7 +22,6 @@ public class SwaggerAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Verifica se a requisição possui o cabeçalho de autorização
         String authHeader = request.getHeader(AUTH_HEADER);
         if (authHeader != null && authHeader.startsWith(BASIC)) {
             String base64Credentials = authHeader.substring(BASIC.length());
@@ -31,16 +30,14 @@ public class SwaggerAuthenticationFilter extends OncePerRequestFilter {
             String username = values[0];
             String password = values[1];
 
-            // Valida se o usuário e a senha estão corretos
             if ("username".equals(username) && "password".equals(password)) {
-                // Cria o token de autenticação
+
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, password, null); // Não há roles nesse caso
+                        username, password, null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 
-        // Continua com o filtro da requisição
         filterChain.doFilter(request, response);
     }
 }

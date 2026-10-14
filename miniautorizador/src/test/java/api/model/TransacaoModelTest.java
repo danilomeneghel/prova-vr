@@ -15,8 +15,8 @@ class TransacaoModelTest {
     void testTransacaoModelCreation() {
         CartaoModel cartao = CartaoModel.builder()
                 .id(1L)
-                .numeroCartao(123456789L)
-                .saldo(new SaldoModel(new BigDecimal("100.00")))
+                .numeroCartao("123456789")
+                .saldo(new BigDecimal("100.00"))
                 .status(CartaoStatus.ATIVO)
                 .build();
 

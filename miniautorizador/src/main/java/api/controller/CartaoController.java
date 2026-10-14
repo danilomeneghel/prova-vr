@@ -1,8 +1,9 @@
 package api.controller;
 
-import api.entity.CartaoEntity;
 import api.enums.CartaoStatus;
+import api.entity.CartaoEntity;
 import api.model.CartaoModel;
+import api.model.CartaoRespostaModel;
 import api.model.CriaCartaoModel;
 import api.service.CartaoService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -19,48 +20,50 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/cartoes" )
+@RequestMapping("/cartoes")
 @OpenAPIDefinition(info = @Info(title = "Mini Autorizador", description = "API REST - VR Benefícios"))
-@Tag( name = "Cartões", description = "Cadastro de Cartões" )
+@Tag(name = "Cartões", description = "Cadastro de Cartões")
 @Validated
 public class CartaoController {
 
     @Autowired
     private CartaoService cartaoService;
 
-    @GetMapping( value = "/{numeroCartao}" )
-    public ResponseEntity< BigDecimal > getCardByNumber(@PathVariable Long numeroCartao) {
-        return new ResponseEntity< >(cartaoService.findCartaoByNumeroCartao(numeroCartao), HttpStatus.OK);
+    @GetMapping(value = "/{numeroCartao}")
+    public ResponseEntity<BigDecimal> getCardByNumber(@PathVariable String numeroCartao) {
+        return cartaoService.findCartaoByNumeroCartao(numeroCartao)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping( value = "/id/{id}" )
-    public ResponseEntity< CartaoModel > getCardById(@PathVariable Long id) {
-        return new ResponseEntity< >(cartaoService.findCartaoById(id), HttpStatus.OK);
+    @GetMapping(value = "/id/{id}")
+    public ResponseEntity<CartaoModel> getCardById(@PathVariable Long id) {
+        return new ResponseEntity<>(cartaoService.findCartaoById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity< List< CartaoModel > > listCards() {
-        return new ResponseEntity< >( cartaoService.findAllByOrderByNumeroCartaoAsc(), HttpStatus.OK );
+    public ResponseEntity<List<CartaoModel>> listCards() {
+        return new ResponseEntity<>(cartaoService.findAllByOrderByNumeroCartaoAsc(), HttpStatus.OK);
     }
 
-    @GetMapping( value = "/status/{status}" )
-    public ResponseEntity< List< CartaoModel > > listCardsByStatus( @PathVariable( "status" ) String status ) {
-        return new ResponseEntity< >( cartaoService.findAllByStatusOrderByNumeroCartaoAsc( CartaoStatus.fromValue( status ) ), HttpStatus.OK );
+    @GetMapping(value = "/status/{status}")
+    public ResponseEntity<List<CartaoModel>> listCardsByStatus(@PathVariable("status") String status) {
+        return new ResponseEntity<>(cartaoService.findAllByStatusOrderByNumeroCartaoAsc(CartaoStatus.fromValue(status)), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity< CartaoModel > createCard( @RequestBody @Valid CriaCartaoModel criaCartaoModel) {
-        return new ResponseEntity< >(cartaoService.save(criaCartaoModel), HttpStatus.CREATED );
+    public ResponseEntity<CartaoRespostaModel> createCard(@RequestBody @Valid CriaCartaoModel criaCartaoModel) {
+        return new ResponseEntity<>(cartaoService.save(criaCartaoModel), HttpStatus.CREATED);
     }
 
-    @PutMapping( value = "/{id}" )
-    public ResponseEntity< CartaoModel > updateCard( @PathVariable( "id" ) Long id, @Valid @RequestBody CartaoEntity cartaoEntity) {
-        return new ResponseEntity< >(cartaoService.update( id, cartaoEntity), HttpStatus.OK );
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<CartaoModel> updateCard(@PathVariable("id") Long id, @Valid @RequestBody CartaoEntity cartaoEntity) {
+        return new ResponseEntity<>(cartaoService.update(id, cartaoEntity), HttpStatus.OK);
     }
 
-    @DeleteMapping( value = "/{id}" )
-    public ResponseEntity< String > deleteCard( @PathVariable( "id" ) Long id ) {
-        return new ResponseEntity< >( cartaoService.deleteCartaoById( id ), HttpStatus.OK );
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<String> deleteCard(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(cartaoService.deleteCartaoById(id), HttpStatus.OK);
     }
 
 }

@@ -4,10 +4,11 @@ import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.entity.TransacaoEntity;
 import api.enums.CartaoStatus;
-import api.exception.ModelException;
+import api.exception.TransacaoException;
 import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.model.errors.TransacaoErrors;
+import api.exception.ModelException;
 import api.service.TransacaoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,12 +50,12 @@ class TransacaoRepositoryTest {
         MockitoAnnotations.openMocks(this);
 
         criaTransacaoModel = new CriaTransacaoModel();
-        criaTransacaoModel.setNumeroCartao(Long.valueOf("1234567890123456"));
-        criaTransacaoModel.setSenha("1234");
+        criaTransacaoModel.setNumeroCartao("1234567890123456");
+        criaTransacaoModel.setSenhaCartao("1234");
         criaTransacaoModel.setValor(BigDecimal.valueOf(100));
 
         cartaoEntity = new CartaoEntity();
-        cartaoEntity.setNumeroCartao(Long.valueOf("1234567890123456"));
+        cartaoEntity.setNumeroCartao("1234567890123456");
         cartaoEntity.setSenha("1234");
         cartaoEntity.setStatus(CartaoStatus.ATIVO);
 
@@ -113,14 +114,11 @@ class TransacaoRepositoryTest {
         Mockito.when(cartaoRepository.findByNumeroCartao(criaTransacaoModel.getNumeroCartao()))
                 .thenReturn(Optional.of(cartaoEntity));
 
-        Mockito.when(saldoRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(saldoEntity));
-
-        ModelException exception = assertThrows(ModelException.class, () -> {
+        TransacaoException exception = assertThrows(TransacaoException.class, () -> {
             transacaoService.save(criaTransacaoModel);
         });
 
-        assertTrue(exception.getMessage().contains(TransacaoErrors.INSUFFICIENT_BALANCE.getMessage()));
+        assertEquals("SALDO_INSUFICIENTE", exception.getMessage());
     }
 
     @Test
@@ -131,41 +129,41 @@ class TransacaoRepositoryTest {
         Mockito.when(cartaoRepository.findByNumeroCartao(criaTransacaoModel.getNumeroCartao()))
                 .thenReturn(Optional.of(cartaoEntity));
 
-        ModelException exception = assertThrows(ModelException.class, () -> {
+        TransacaoException exception = assertThrows(TransacaoException.class, () -> {
             transacaoService.save(criaTransacaoModel);
         });
 
-        assertTrue(exception.getMessage().contains(TransacaoErrors.INATIVE_CARD.getMessage()));
+        assertEquals("CARTAO_INEXISTENTE", exception.getMessage());
     }
 
     @Test
-    @DisplayName("Cria uma transação com senha incorreta")
+    @DisplayName("Cria uma transação com senha incorreta (campo senhaCartao)")
     void testSaveTransacaoComSenhaIncorreta() {
-        criaTransacaoModel.setSenha("4321");
+        criaTransacaoModel.setSenhaCartao("4321");
 
         Mockito.when(cartaoRepository.findByNumeroCartao(criaTransacaoModel.getNumeroCartao()))
                 .thenReturn(Optional.of(cartaoEntity));
 
-        ModelException exception = assertThrows(ModelException.class, () -> {
+        TransacaoException exception = assertThrows(TransacaoException.class, () -> {
             transacaoService.save(criaTransacaoModel);
         });
 
-        assertTrue(exception.getMessage().contains(TransacaoErrors.INVALID_PASSWORD.getMessage()));
+        assertEquals("SENHA_INVALIDA", exception.getMessage());
     }
 
     @Test
     @DisplayName("Cria uma transação com número de cartão inválido")
     void testSaveTransacaoComNumeroCartaoInvalido() {
-        criaTransacaoModel.setNumeroCartao(Long.valueOf("0000000000000000"));
+        criaTransacaoModel.setNumeroCartao("0000000000000000");
 
-        Mockito.when(cartaoRepository.findByNumeroCartao(criaTransacaoModel.getNumeroCartao()))
+        Mockito.when(cartaoRepository.findByNumeroCartao("0000000000000000"))
                 .thenReturn(Optional.empty());
 
-        ModelException exception = assertThrows(ModelException.class, () -> {
+        TransacaoException exception = assertThrows(TransacaoException.class, () -> {
             transacaoService.save(criaTransacaoModel);
         });
 
-        assertTrue(exception.getMessage().contains(TransacaoErrors.INVALID_NUMBER_CARD.getMessage()));
+        assertEquals("CARTAO_INEXISTENTE", exception.getMessage());
     }
 
     @Test

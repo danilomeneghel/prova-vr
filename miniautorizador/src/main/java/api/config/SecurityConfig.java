@@ -17,20 +17,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable() // Desabilita CSRF para APIs
+        http.csrf().disable()
                 .authorizeRequests()
-                // Protege todos os endpoints da API com autenticação básica (seja GET, POST, PUT, DELETE)
-                .antMatchers("/cartoes/**", "/transacoes/**", "/**").authenticated() // Protege todos os endpoints /cartoes e /transacoes
+
+                .antMatchers("/cartoes/**", "/transacoes/**", "/**").authenticated()
                 .and()
-                .httpBasic() // Exige autenticação Basic Auth para todos os endpoints
+                .httpBasic()
                 .and()
-                .addFilterBefore(new SwaggerAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Customização do filtro (se necessário)
+                .addFilterBefore(new SwaggerAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
     protected UserDetailsService userDetailsService() {
         return username -> {
-            // Usuário fixo para login (apenas para testes)
+
             if ("username".equals(username)) {
                 return User.builder()
                         .username("username")

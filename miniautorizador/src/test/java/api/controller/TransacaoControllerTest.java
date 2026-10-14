@@ -2,6 +2,7 @@ package api.controller;
 
 import api.ApplicationTests;
 import api.entity.TransacaoEntity;
+import api.exception.ModelExceptionHandler;
 import api.repository.TransacaoRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +30,25 @@ public class TransacaoControllerTest extends ApplicationTests {
 
     @BeforeEach
     public void setUp() throws Exception {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
     }
 
     @Test
-    @DisplayName("Cria a Transação")
+    @DisplayName("Cria a Transação - retorna 201 com body 'OK'")
     public void testPOSTTransaction() throws Exception {
-        String cartao = "{\"numeroCartao\": \"1111111111111111\", \"senha\": \"222222222\", \"status\": \"ATIVO\"}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).build();
+        String cartao = "{\"numeroCartao\": \"1111111111111111\", \"senha\": \"1234\"}";
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cartao)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"numeroCartao\": \"1111111111111111\", \"senha\": \"222222222\", \"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"1111111111111111\", \"senhaCartao\": \"1234\", \"valor\": 10.00}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transacao)
@@ -55,22 +57,56 @@ public class TransacaoControllerTest extends ApplicationTests {
     }
 
     @Test
-    @DisplayName("Pega todas as Transações")
-    public void testGETTransactions() throws Exception {
-        transacaoRepository.deleteAll();
+    @DisplayName("Retorna 422 SENHA_INVALIDA ao usar senha errada")
+    public void testTransacaoSenhaInvalida() throws Exception {
+        String cartao = "{\"numeroCartao\": \"2222222222222222\", \"senha\": \"1234\"}";
 
-        String cartao = "{\"numeroCartao\": \"2222222222222222\", \"senha\": \"333333333333\", \"status\": \"ATIVO\"}";
-
-        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cartao)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"numeroCartao\": \"2222222222222222\", \"senha\": \"333333333333\", \"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"2222222222222222\", \"senhaCartao\": \"ERRADA\", \"valor\": 10.00}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("Retorna 422 CARTAO_INEXISTENTE ao usar cartão não cadastrado")
+    public void testTransacaoCartaoInexistente() throws Exception {
+        String transacao = "{\"numeroCartao\": \"0000000000000000\", \"senhaCartao\": \"1234\", \"valor\": 10.00}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("Pega todas as Transações")
+    public void testGETTransactions() throws Exception {
+        transacaoRepository.deleteAll();
+
+        String cartao = "{\"numeroCartao\": \"3333333333333333\", \"senha\": \"3333\"}";
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cartao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        String transacao = "{\"numeroCartao\": \"3333333333333333\", \"senhaCartao\": \"3333\", \"valor\": 10.20}";
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transacao)
@@ -83,20 +119,20 @@ public class TransacaoControllerTest extends ApplicationTests {
     }
 
     @Test
-    @DisplayName("Pega o Transação por ID do Transação")
+    @DisplayName("Pega a Transação por ID")
     public void testGETTransaction() throws Exception {
-        String cartao = "{\"numeroCartao\": \"3333333333333333\", \"senha\": \"444444444444\", \"status\": \"ATIVO\"}";
+        String cartao = "{\"numeroCartao\": \"4444444444444444\", \"senha\": \"4444\"}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cartao)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"numeroCartao\": \"3333333333333333\", \"senha\": \"444444444444\", \"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"4444444444444444\", \"senhaCartao\": \"4444\", \"valor\": 10.20}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transacao)
@@ -105,25 +141,25 @@ public class TransacaoControllerTest extends ApplicationTests {
 
         TransacaoEntity lastTransaction = transacaoRepository.findTopByOrderByIdDesc();
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API+"/{id}", lastTransaction.getId()))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(URL_API + "/{id}", lastTransaction.getId()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @DisplayName("Exclui o Transação por ID")
+    @DisplayName("Exclui a Transação por ID")
     public void testDELETETransaction() throws Exception {
-        String cartao = "{\"numeroCartao\": \"5555555555555555\", \"senha\": \"66666666666\", \"status\": \"ATIVO\"}";
+        String cartao = "{\"numeroCartao\": \"5555555555555555\", \"senha\": \"5555\"}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cartao)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String transacao = "{\"numeroCartao\": \"5555555555555555\", \"senha\": \"66666666666\", \"valor\": \"10.20\"}";
+        String transacao = "{\"numeroCartao\": \"5555555555555555\", \"senhaCartao\": \"5555\", \"valor\": 10.20}";
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
         this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(transacao)

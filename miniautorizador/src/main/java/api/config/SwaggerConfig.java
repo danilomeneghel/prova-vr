@@ -14,14 +14,14 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("API Example").version("1.0"))
-                .addSecurityItem(new SecurityRequirement().addList("basicAuth")); // Requer autenticação
+                .addSecurityItem(new SecurityRequirement().addList("basicAuth"));
     }
 
     @Bean
     public SecurityScheme basicAuth() {
         return new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP)
-                .scheme("basic") // Define a autenticação como Basic Auth
+                .scheme("basic")
                 .description("Autenticação básica com nome de usuário e senha");
     }
 }

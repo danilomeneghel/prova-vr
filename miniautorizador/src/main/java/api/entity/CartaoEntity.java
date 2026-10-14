@@ -23,14 +23,14 @@ public class CartaoEntity {
     @Column( name = "id", unique = true, nullable = false )
     private Long id;
 
-    @Column(name = "numeroCartao", nullable = false)
+    @Column(name = "numeroCartao", nullable = false, unique = true)
     @NotNull( message = "Número do cartão é obrigatório" )
-    private Long numeroCartao;
+    private String numeroCartao;
 
     @Column(name = "senha")
     private String senha;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_saldo", nullable = false)
     private SaldoEntity saldo;
 

@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class CriaCartaoModel {
 
-    private Long numeroCartao;
+    private String numeroCartao;
 
     private String senha;
 

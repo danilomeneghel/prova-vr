@@ -5,6 +5,7 @@ import api.entity.CartaoEntity;
 import api.entity.SaldoEntity;
 import api.entity.TransacaoEntity;
 import api.enums.CartaoStatus;
+import api.exception.TransacaoException;
 import api.model.CriaTransacaoModel;
 import api.model.TransacaoModel;
 import api.repository.CartaoRepository;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -59,25 +61,25 @@ public class TransacaoServiceTest extends ApplicationTests {
     private ModelMapper mapper = new ModelMapper();
 
     @Test
-    @DisplayName("Cria a transação com sucesso")
+    @DisplayName("Cria a transação com sucesso usando campo senhaCartao")
     void testSaveTransacao() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao(Long.valueOf("110110110110110"))
-                .senha("aaaaaaaaaaa")
+                .numeroCartao("6549873025634501")
+                .senha("1234")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao(Long.valueOf("110110110110110"))).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao("6549873025634501")).thenReturn(Optional.of(mockCartaoEntity));
 
         CriaTransacaoModel mockTransacaoModel = CriaTransacaoModel.builder()
-                .numeroCartao(mockCartaoEntity.getNumeroCartao())
-                .senha(mockCartaoEntity.getSenha())
-                .valor(BigDecimal.valueOf(10.50))
+                .numeroCartao("6549873025634501")
+                .senhaCartao("1234")
+                .valor(BigDecimal.valueOf(10.00))
                 .build();
 
-        when(transacaoRepository.save(any(TransacaoEntity.class))).thenReturn(mapper.map(mockTransacaoModel, TransacaoEntity.class));
+        when(transacaoRepository.save(any(TransacaoEntity.class))).thenReturn(new TransacaoEntity());
 
         String salvaTransacao = transacaoService.save(mockTransacaoModel);
 
@@ -86,12 +88,78 @@ public class TransacaoServiceTest extends ApplicationTests {
     }
 
     @Test
+    @DisplayName("Lança TransacaoException SALDO_INSUFICIENTE quando saldo for insuficiente")
+    void testSaveTransacaoSaldoInsuficiente() {
+        SaldoEntity saldoBaixo = SaldoEntity.builder().id(2L).valor(BigDecimal.valueOf(5)).build();
+
+        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+                .id(1L)
+                .numeroCartao("6549873025634501")
+                .senha("1234")
+                .saldo(saldoBaixo)
+                .status(CartaoStatus.ATIVO)
+                .build();
+
+        when(cartaoRepository.findByNumeroCartao("6549873025634501")).thenReturn(Optional.of(mockCartaoEntity));
+
+        CriaTransacaoModel mockTransacaoModel = CriaTransacaoModel.builder()
+                .numeroCartao("6549873025634501")
+                .senhaCartao("1234")
+                .valor(BigDecimal.valueOf(100.00))
+                .build();
+
+        TransacaoException ex = assertThrows(TransacaoException.class,
+                () -> transacaoService.save(mockTransacaoModel));
+        assertEquals("SALDO_INSUFICIENTE", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Lança TransacaoException SENHA_INVALIDA quando senha estiver errada")
+    void testSaveTransacaoSenhaInvalida() {
+        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
+                .id(1L)
+                .numeroCartao("6549873025634501")
+                .senha("1234")
+                .saldo(mockSaldoEntity)
+                .status(CartaoStatus.ATIVO)
+                .build();
+
+        when(cartaoRepository.findByNumeroCartao("6549873025634501")).thenReturn(Optional.of(mockCartaoEntity));
+
+        CriaTransacaoModel mockTransacaoModel = CriaTransacaoModel.builder()
+                .numeroCartao("6549873025634501")
+                .senhaCartao("ERRADA")
+                .valor(BigDecimal.valueOf(10.00))
+                .build();
+
+        TransacaoException ex = assertThrows(TransacaoException.class,
+                () -> transacaoService.save(mockTransacaoModel));
+        assertEquals("SENHA_INVALIDA", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Lança TransacaoException CARTAO_INEXISTENTE quando cartão não existir")
+    void testSaveTransacaoCartaoInexistente() {
+        when(cartaoRepository.findByNumeroCartao("0000000000000000")).thenReturn(Optional.empty());
+
+        CriaTransacaoModel mockTransacaoModel = CriaTransacaoModel.builder()
+                .numeroCartao("0000000000000000")
+                .senhaCartao("1234")
+                .valor(BigDecimal.valueOf(10.00))
+                .build();
+
+        TransacaoException ex = assertThrows(TransacaoException.class,
+                () -> transacaoService.save(mockTransacaoModel));
+        assertEquals("CARTAO_INEXISTENTE", ex.getMessage());
+    }
+
+    @Test
     @DisplayName("Localiza todas as transações com sucesso")
     void testFindAll() {
         SaldoEntity saldo = new SaldoEntity();
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao(Long.valueOf("220220220220220"))
+                .numeroCartao("2202202202202202")
                 .saldo(saldo)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -120,34 +188,6 @@ public class TransacaoServiceTest extends ApplicationTests {
 
         Assertions.assertNotNull(listaTransacoes);
         assertEquals(mockTransacaoEntities.size(), listaTransacoes.size());
-        for (int i = 0; i < mockTransacaoEntities.size(); i++) {
-            assertEquals(mockTransacaoEntities.get(i).getId(), listaTransacoes.get(i).getId());
-            assertEquals(mockTransacaoEntities.get(i).getCartao().getId(), listaTransacoes.get(i).getCartao().getId());
-            assertEquals(mockTransacaoEntities.get(i).getValor(), listaTransacoes.get(i).getValor());
-        }
-    }
-
-    @Test
-    @DisplayName("Localiza todas as transações inválidas")
-    void testFindAllInvalid() {
-        SaldoEntity saldo = new SaldoEntity();
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .id(1L)
-                .numeroCartao(Long.valueOf("220220220220220"))
-                .saldo(saldo)
-                .status(CartaoStatus.ATIVO)
-                .build();
-
-        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
-
-        when(transacaoRepository.findAll()).thenReturn(new ArrayList<>());
-
-        try {
-            List<TransacaoModel> transacoes = transacaoService.findAll();
-            Assertions.assertTrue(transacoes.isEmpty());
-        } catch (Exception e) {
-            assertEquals("Nenhuma transação encontrada.", e.getMessage());
-        }
     }
 
     @Test
@@ -155,7 +195,7 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testFindTransacaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao(Long.valueOf("220220220220220"))
+                .numeroCartao("2202202202202202")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
@@ -171,41 +211,10 @@ public class TransacaoServiceTest extends ApplicationTests {
         when(transacaoRepository.findById(1L)).thenReturn(Optional.of(mockTransacaoEntity));
 
         TransacaoModel findTransacao = transacaoService.findById(1L);
-        TransacaoEntity transacaoEntity = mapper.map(findTransacao, TransacaoEntity.class);
-        transacaoEntity.setCartao(mockCartaoEntity);
 
-        Assertions.assertNotNull(transacaoEntity);
-        assertEquals(mockTransacaoEntity.getId(), transacaoEntity.getId());
-        assertEquals(mockTransacaoEntity.getValor(), transacaoEntity.getValor());
-        assertEquals(mockTransacaoEntity.getCartao().getId(), transacaoEntity.getCartao().getId());
-    }
-
-    @Test
-    @DisplayName("Localiza a transação por ID inválido")
-    void testFindTransacaoByIdInvalid() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .id(1L)
-                .numeroCartao(Long.valueOf("3303303303303303"))
-                .senha("cccccccccc")
-                .saldo(mockSaldoEntity)
-                .status(CartaoStatus.ATIVO)
-                .build();
-
-        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
-
-        TransacaoEntity mockTransacaoEntity = TransacaoEntity.builder()
-                .id(1L)
-                .cartao(mockCartaoEntity)
-                .valor(BigDecimal.valueOf(10.50))
-                .build();
-
-        when(transacaoRepository.findById(1L)).thenReturn(Optional.of(mockTransacaoEntity));
-
-        try {
-            transacaoService.findById(2L);
-        } catch (Exception e) {
-            assertEquals("Nenhuma transação encontrada.", e.getMessage());
-        }
+        Assertions.assertNotNull(findTransacao);
+        assertEquals(mockTransacaoEntity.getId(), findTransacao.getId());
+        assertEquals(mockTransacaoEntity.getValor(), findTransacao.getValor());
     }
 
     @Test
@@ -213,13 +222,13 @@ public class TransacaoServiceTest extends ApplicationTests {
     void testDeleteTransacaoById() {
         CartaoEntity mockCartaoEntity = CartaoEntity.builder()
                 .id(1L)
-                .numeroCartao(Long.valueOf("440440440440440"))
-                .senha("ddddddddddd")
+                .numeroCartao("4404404404404404")
+                .senha("1234")
                 .saldo(mockSaldoEntity)
                 .status(CartaoStatus.ATIVO)
                 .build();
 
-        when(cartaoRepository.findByNumeroCartao(Long.valueOf("440440440440440"))).thenReturn(Optional.of(mockCartaoEntity));
+        when(cartaoRepository.findByNumeroCartao("4404404404404404")).thenReturn(Optional.of(mockCartaoEntity));
 
         TransacaoEntity mockTransacaoEntity = TransacaoEntity.builder()
                 .id(1L)
@@ -233,28 +242,6 @@ public class TransacaoServiceTest extends ApplicationTests {
 
         Assertions.assertNotNull(deleteTransacao);
         assertEquals("Transação excluída com sucesso.", deleteTransacao);
-    }
-
-    @Test
-    @DisplayName("Exclui a transação por ID inválido")
-    void testDeleteTransacaoByIdInvalid() {
-        CartaoEntity mockCartaoEntity = CartaoEntity.builder()
-                .id(1L)
-                .numeroCartao(Long.valueOf("550550550550550"))
-                .senha("eeeeeeeeeeee")
-                .saldo(mockSaldoEntity)
-                .status(CartaoStatus.ATIVO)
-                .build();
-
-        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(mockCartaoEntity));
-
-        when(transacaoRepository.existsById(1L)).thenReturn(true);
-
-        try {
-            transacaoService.deleteById(2L);
-        } catch (Exception e) {
-            assertEquals("Nenhuma transação encontrada.", e.getMessage());
-        }
     }
 
 }

@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CriaTransacaoModel {
 
-    private Long numeroCartao;
+    private String numeroCartao;
 
-    private String senha;
+    private String senhaCartao;
 
     private BigDecimal valor;
 
