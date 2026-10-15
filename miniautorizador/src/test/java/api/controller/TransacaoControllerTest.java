@@ -176,4 +176,39 @@ public class TransacaoControllerTest extends ApplicationTests {
         }
     }
 
+    @Test
+    @DisplayName("Autoriza múltiplas transações no mesmo cartão enquanto houver saldo")
+    public void testMultiplasTransacoesMesmoCartao() throws Exception {
+        String cartao = "{\"numeroCartao\": \"6666666666666666\", \"senha\": \"6666\"}";
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/cartoes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cartao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        String transacao = "{\"numeroCartao\": \"6666666666666666\", \"senhaCartao\": \"6666\", \"valor\": 10.00}";
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(transacaoController).setControllerAdvice(new ModelExceptionHandler()).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().string("OK"));
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post(URL_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(transacao)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().string("OK"));
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cartaoController).setControllerAdvice(new ModelExceptionHandler()).build();
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/cartoes/{numeroCartao}", "6666666666666666"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").value(480.0));
+    }
+
 }

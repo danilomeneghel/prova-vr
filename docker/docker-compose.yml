@@ -14,7 +14,7 @@ services:
   mysql:
     image: mysql:8
     hostname: mysql
-    container_name: mysql
+    container_name: vr-mysql
     restart: always
     ports:
       - "3306:3306"

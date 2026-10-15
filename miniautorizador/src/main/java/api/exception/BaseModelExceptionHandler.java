@@ -36,7 +36,7 @@ public abstract class BaseModelExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex, WebRequest request) {
-        HttpStatus status = ex.getStatus();
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
         ErrorModel errorModel = new ErrorModel(status.value(), status.value() + "000", ex.getReason());
         return new ResponseEntity<>(errorModel, status);
     }

@@ -1,3 +1,3 @@
-FROM maven:3.8.6-amazoncorretto-17
+FROM maven:3.9.16-amazoncorretto-21
 
 COPY ./ ./
