@@ -62,33 +62,42 @@ Caso não tenha o Maven instalado ou tenha outra versão, pode usar o comando ./
 
 ## Docker (Opcional)
 
-O arquivo `docker/docker-compose.yml` foi mantido exatamente como disponibilizado no
-desafio: contém os dois bancos de dados (MySQL ativo e MongoDB comentado), **sem
-alterações na declaração do banco selecionado (MySQL)** e **sem serviços adicionais**
-(o SonarQube, por exemplo, não faz parte do compose).
+O arquivo `docker/docker-compose.yml` sobe o MySQL e a aplicação em containers. A
+declaração do banco selecionado (MySQL) foi mantida exatamente como disponibilizada no
+desafio e o MongoDB permanece comentado (serviço opcional, não faz parte do compose).
 
-Para subir apenas o banco de dados MySQL:
+Para subir o banco de dados e a aplicação:
 
 ```
 $ cd docker
-$ docker-compose up -d
+$ docker compose up -d --build
 ```
 
-O MySQL ficará disponível em `localhost:3306`, banco `miniautorizador`, usuário `root`
-sem senha. Em seguida, suba a aplicação via Maven (perfil `dev`), que já aponta para
-esse banco:
+O serviço `mysql` ficará disponível em `localhost:3306` (banco `miniautorizador`,
+usuário `root` sem senha) e o serviço `api` em `http://localhost:8080`. O container da
+aplicação aguarda o MySQL ficar disponível e então executa a aplicação com o perfil
+`docker`, que já aponta para o host `mysql`:
 
 ```
-$ cd miniautorizador
+$ docker compose logs -f api
+```
+
+O primeiro `up` pode demorar alguns minutos, pois o Maven baixa as dependências dentro
+do container.
+
+Também é possível rodar apenas o banco em Docker e a aplicação localmente via Maven:
+
+```
+$ cd docker
+$ docker compose up -d mysql
+$ cd ../miniautorizador
 $ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-A API ficará disponível em `http://localhost:8080`.
-
-Para encerrar o banco:
+Para encerrar tudo:
 
 ```
-$ docker-compose down
+$ docker compose down
 ```
 
 
@@ -106,7 +115,7 @@ Login:
 ## SonarQube (Opcional)
 
 A análise de qualidade e cobertura via SonarQube é **opcional** e **não faz parte do
-`docker-compose.yml`** (que contém somente os bancos de dados, conforme o desafio).
+`docker-compose.yml`**.
 Caso queira utilizá-la, suba uma instância própria do SonarQube (por exemplo, com
 `docker run -p 9000:9000 sonarqube:9.9.7-community`), gere um token e execute:
 
