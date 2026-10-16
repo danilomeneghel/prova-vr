@@ -18,7 +18,7 @@ Avaliação técnica de uma API de Mini Autorizador, desenvolvido em Java com Sp
 
 - Java JDK 21
 - Apache Maven >= 3.9.8
-- MySql 8
+- MySql 5.7
 - Docker (Opcional)
 
 
@@ -147,7 +147,7 @@ $ cd prova-vr
 ## Maven
 
 Para rodar o projeto com Maven, é necessário ter a versão 3.9.8 ou superior instalada.<br>
-Além disso, é preciso ter o Java 21 e o MySql 8 instalado.<br>
+Além disso, é preciso ter o Java 21 e o MySql 5.7 instalado.<br>
 Importe o arquivo SQL disponível na pasta `dump-sql` para sua instância do MySql.
 
 Tendo tudo instalado e rodando localmente, basta executar o seguinte comando:

@@ -12,19 +12,16 @@ services:
 #    volumes:
 #      - ./scripts/init.js:/docker-entrypoint-initdb.d/init.js:ro
   mysql:
-    image: mysql:8
+    image: mysql:5.7
     hostname: mysql
-    container_name: vr-mysql
+    container_name: mysql
     restart: always
     ports:
       - "3306:3306"
     environment:
-      MYSQL_HOST: localhost
       MYSQL_DATABASE: miniautorizador
       MYSQL_ROOT_PASSWORD:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    volumes:
-      - ./:/mysql
   api:
     container_name: vr-api
     build:
